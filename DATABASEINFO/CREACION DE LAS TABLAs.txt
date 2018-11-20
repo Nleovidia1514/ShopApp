@@ -1,0 +1,66 @@
+create table Provider(
+IdProvider INTEGER NOT NULL PRIMARY KEY,
+NombreP Varchar(20),
+DireccionP varchar (50),
+SaldoP Numeric(10,2));
+
+create table Category(
+IdCategory INTEGER NOT NULL PRIMARY KEY,
+NombreC Varchar(20));
+
+create table Client(
+IdClient INTEGER NOT NULL PRIMARY KEY,
+NombreC Varchar(30),
+DireccionC Varchar(100),
+SaldoC Numeric(10,2));
+
+create table Product(
+IdProduct INTEGER NOT NULL PRIMARY KEY,
+DescripcionP Varchar(100),
+BuyPrice Numeric(10,2),
+SellPrice Numeric(10,2),
+Restock INTEGER,
+Stocked  INTEGER,
+IdProvider INTEGER NOT NULL,
+FOREIGN KEY (IdProvider) references Provider(IdProvider)
+ON DELETE NO ACTION ON UPDATE CASCADE,
+IdCategory INTEGER NOT NULL,
+FOREIGN KEY (IdCategory) references Category(IdCategory)
+ON DELETE NO ACTION ON UPDATE CASCADE);
+
+create table Ocupacion(
+IdOcupacion INTEGER NOT NULL PRIMARY KEY,
+NombreO Varchar(15),
+SalarioO Numeric(10,2);
+
+create table Empleado(
+IdEmpleado INTEGER NOT NULL PRIMARY KEY,
+NombreE Varchar(40),
+DireccionE Varchar(60),
+IdOcupacion INTEGER NOT NULL,
+FOREIGN KEY(IdOcupacion) references Ocupacion(IdOcupacion) 
+ON DELETE NO ACTION ON UPDATE CASCADE,
+Sex Varchar(1));
+
+create table Factura(
+IdFactura INTEGER NOT NULL PRIMARY KEY,
+Fecha timestamp,
+IdClient INTEGER NOT NULL, 
+FOREIGN KEY(IdClient) references Client(IdClient) 
+ON DELETE NO ACTION ON UPDATE CASCADE,
+IdEmpleado INTEGER NOT NULL, 
+FOREIGN KEY(IdEmpleado) references Empleado(IdEmpleado) 
+ON DELETE NO ACTION ON UPDATE CASCADE,
+Subtotal Numeric(12,2),
+Total Numeric(12,2));
+
+create table Detalle(
+IdFactura INTEGER NOT NULL, FOREIGN KEY(IdFactura) references Factura(IdFactura) 
+ON DELETE NO ACTION ON UPDATE CASCADE,
+IdProduct INTEGER NOT NULL, FOREIGN KEY(IdProduct) references Product(IdProduct) 
+ON DELETE NO ACTION ON UPDATE CASCADE,
+Quantity INTEGER,
+SellPrice Numeric(13,2),
+Total Numeric(13,2));
+
+set datestyle to european;
