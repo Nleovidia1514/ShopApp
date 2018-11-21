@@ -3,6 +3,8 @@ package com.labc.A3;
 import java.text.SimpleDateFormat;
 import java.util.Random;
 
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
@@ -13,10 +15,14 @@ public class Main {
 	public static JTextField cedulaID;
 	public static JTextField clientName;
 	public static JTextArea clientAdr;
+	public static JComboBox idType;
+	public static JFrame frame;
+	public static JTextArea productsArea;
 	
 	public static void main(String[] args) {
 		ConnManager.getConnection();
-		new UserInterface().frame.setVisible(true);
+		frame = new UserInterface();
+		frame.setVisible(true);
 	}
 
 }

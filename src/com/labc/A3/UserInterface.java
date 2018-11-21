@@ -1,6 +1,7 @@
 package com.labc.A3;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JComboBox;
@@ -16,12 +17,13 @@ public class UserInterface extends JFrame {
 
 	public JFrame frame = this;
 	private JTabbedPane tabbedPane;
-	private JPanel contentPane, panel;
+	private JPanel contentPane;
 	private JTextField cedulaID, idProductTF, employeeIDTF, clientNameTF;
 	private JScrollBar scrollBar;
-	private JComboBox comboBox;
+	private JComboBox<String> comboBox;
 	private JTextArea productsTA, adressTF, textArea_2, textArea_3, idProductTA, employeeIDTA, nameTA;
 	private JButton billButton, resetButton, clearButton, addCustButton;
+	public static String format = String.format("%1$-30s %2$-30s %3$-30s %4$-30s|","Product","Price","Quantity","Total");
 
 	/**
 	 * Launch the application.
@@ -48,23 +50,40 @@ public class UserInterface extends JFrame {
 		tabbedPane.setBounds(0, 0, 852, 603);
 		contentPane.add(tabbedPane);
 		
-		panel = new JPanel();
+		JPanel panel = new JPanel();
+		innitBillingTab(panel);
+		
+		JPanel panel_1 = new JPanel();
+		tabbedPane.addTab("ADMINISTRATOR", null, panel_1, null);
+		frame.setResizable(false);
+		frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		
+	}
+	
+	private void innitBillingTab(JPanel panel) {
+		ButtonAction.format = UserInterface.format;
 		panel.setLayout(null);
 		panel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		tabbedPane.addTab("BILLING", null, panel, null);
 		
-		comboBox = new JComboBox();
+		comboBox = new JComboBox<String>();
 		comboBox.setBounds(35, 30, 45, 22);
+		comboBox.addItem("V");
+		comboBox.addItem("J");
+		comboBox.addItem("E");
+		Main.idType = comboBox;
 		panel.add(comboBox);
 		
 		cedulaID = new JTextField();
 		cedulaID.setColumns(10);
-		cedulaID.setBounds(75, 30, 140, 22);
+		cedulaID.setBounds(79, 30, 136, 22);
 		Main.cedulaID = cedulaID;
 		panel.add(cedulaID);
 		
-		productsTA = new JTextArea();
+		productsTA = new JTextArea(format);
 		productsTA.setBounds(35, 164, 770, 333);
+		productsTA.setEditable(false);
+		Main.productsArea = productsTA;
 		panel.add(productsTA);
 		
 		adressTF = new JTextArea();
@@ -119,7 +138,7 @@ public class UserInterface extends JFrame {
 		idProductTA.setBounds(35, 519, 166, 20);
 		panel.add(idProductTA);
 		
-		addCustButton = new JButton("ADD COSTUMER\r\n");
+		addCustButton = new JButton("ADD CUSTOMER");
 		addCustButton.setBounds(35, 117, 180, 23);
 		panel.add(addCustButton);
 		
@@ -150,47 +169,72 @@ public class UserInterface extends JFrame {
 		Main.clientName = clientNameTF;
 		panel.add(clientNameTF);
 		
-		JPanel panel_1 = new JPanel();
-		tabbedPane.addTab("ADMINISTRATOR", null, panel_1, null);
-		frame.setResizable(false);
-		frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		
+		JButton cancelButton = new JButton("CANCEL");
+		cancelButton.setBounds(409, 508, 91, 46);
+		panel.add(cancelButton);
 	}
 	
 	private void addActions(){
+		ButtonAction ba = new ButtonAction();
+		billButton.addActionListener(ba);
+		resetButton.addActionListener(ba);
+		addCustButton.addActionListener(ba);
+		clearButton.addActionListener(ba);
 
-		billButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				
-			}});
-		
-		addCustButton.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				new Client();
-				Main.cedulaID.setEditable(false);
-				Main.clientAdr.setEditable(false);
-				Main.clientName.setEditable(false);
-			}});
-		
 		employeeIDTF.addActionListener(new ActionListener(){
-
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Main.employeeID.setEditable(false);
 			}});
 		
 		cedulaID.addActionListener(new ActionListener() {
-
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				Client.getClient();
+				Bill.currentClient = new Client("cedula");
+			}});
+				
+		idProductTF.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if(Bill.currentClient!=null)
+					new Product(Long.valueOf(idProductTF.getText()),Bill.currentClient.getBill());
+				else
+					JOptionPane.showMessageDialog(Main.frame,"Add client first.","Error",JOptionPane.WARNING_MESSAGE);
 			}
-			
 		});
+	}
+}
+
+class ButtonAction implements ActionListener{
+	public static String format;
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		System.out.println(e.getActionCommand());
+		if(e.getActionCommand().equals("BILL")) {
+			
+		}
+		else if(e.getActionCommand().equalsIgnoreCase("ADD CUSTOMER")) {
+			Bill.currentClient = new Client("cust");
+		}
 		
-		
+		else if(e.getActionCommand().equals("RESET")) {
+			Main.cedulaID.setText(null);
+			Main.cedulaID.setEditable(true);
+			Main.clientName.setText(null);
+			Main.clientName.setEditable(true);
+			Main.clientAdr.setText(null);
+			Main.clientAdr.setEditable(true);
+			Main.productsArea.setText(format);
+			Main.employeeID.setText(null);
+			Main.employeeID.setEditable(true);
+		}
+		else if(e.getActionCommand().equals("CLEAR")) {
+			Main.cedulaID.setText(null);
+			Main.cedulaID.setEditable(true);
+			Main.clientName.setText(null);
+			Main.clientName.setEditable(true);
+			Main.clientAdr.setText(null);
+			Main.clientAdr.setEditable(true);
+			Main.productsArea.setText(format);
+		}
 	}
 }

@@ -7,6 +7,8 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Random;
 
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 public class Bill {
@@ -15,28 +17,26 @@ public class Bill {
 	private SimpleDateFormat sdf = Main.sdf;
 	private JTextField employeeID = Main.employeeID;
 	private JTextField cedulaID = Main.cedulaID;
+	private JComboBox idType = Main.idType;
+	public long billNmbr = 0;
+	public static Client currentClient = null;
 	
 	public Bill() {
 		Statement stm = null;
-		int billNmbr = rnd.nextInt(100);
-		String query = "Insert into Factura values("+billNmbr+",'"+sdf.format(System.currentTimeMillis()
-				+"',"+cedulaID.getText()+","+employeeID.getText()+",0,0");
-		try
-		{
+		this.billNmbr = rnd.nextInt(200);
+		try {
+			String query = String.format("Insert into Bill Values (%d,'%s','%s%s',%d,0,0)",
+					billNmbr,sdf.format(System.currentTimeMillis()),idType.getSelectedItem(),cedulaID.getText(),Long.valueOf(employeeID.getText()));
 			stm = connection.createStatement();
 			stm.execute(query);
 			System.out.println("Bill created successfully!");
-		}catch(SQLException e) {
-			System.out.println(e);
+		}catch(Exception e) {
+			JOptionPane.showMessageDialog(Main.frame, e, "Error", JOptionPane.ERROR_MESSAGE);
 		}finally {
-	        if (stm != null) { try {
-	        	System.out.println("Closing statement");
-				stm.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} }
-	    
+	        if (stm != null) { 
+	        	try {stm.close();}catch (SQLException e) {e.printStackTrace();} 
+	        }
+		}
 	}
 	
 	/*public static void generateBill() {
@@ -48,6 +48,6 @@ public class Bill {
 		Statement stm;
 		String query = ""
 	}*/
-	}
+	
 	
 }
