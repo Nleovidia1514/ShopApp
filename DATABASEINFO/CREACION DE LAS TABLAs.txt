@@ -1,66 +1,57 @@
-create table Provider(
-IdProvider INTEGER NOT NULL PRIMARY KEY,
-NombreP Varchar(20),
-DireccionP varchar (50),
-SaldoP Numeric(10,2));
+create table provider(
+idprovider INTEGER NOT NULL PRIMARY KEY,
+pname Varchar(20),
+padress varchar (50));
 
-create table Category(
-IdCategory INTEGER NOT NULL PRIMARY KEY,
-NombreC Varchar(20));
+create table client(
+idclient Varchar(20) PRIMARY KEY,
+cname Varchar(30),
+cadress Varchar(100),
+cmoney Numeric(10,2));
 
-create table Client(
-IdClient INTEGER NOT NULL PRIMARY KEY,
-NombreC Varchar(30),
-DireccionC Varchar(100),
-SaldoC Numeric(10,2));
-
-create table Product(
-IdProduct INTEGER NOT NULL PRIMARY KEY,
-DescripcionP Varchar(100),
-BuyPrice Numeric(10,2),
-SellPrice Numeric(10,2),
-Restock INTEGER,
-Stocked  INTEGER,
-IdProvider INTEGER NOT NULL,
-FOREIGN KEY (IdProvider) references Provider(IdProvider)
-ON DELETE NO ACTION ON UPDATE CASCADE,
-IdCategory INTEGER NOT NULL,
-FOREIGN KEY (IdCategory) references Category(IdCategory)
+create table product(
+idproduct INTEGER NOT NULL PRIMARY KEY,
+pdescription Varchar(100),
+buyprice Numeric(10,2),
+sellprice Numeric(10,2),
+restock INTEGER,
+stock  INTEGER,
+idprovider INTEGER NOT NULL,
+FOREIGN KEY (idprovider) references provider(idprovider)
 ON DELETE NO ACTION ON UPDATE CASCADE);
 
-create table Ocupacion(
-IdOcupacion INTEGER NOT NULL PRIMARY KEY,
-NombreO Varchar(15),
-SalarioO Numeric(10,2);
+create table ocupation(
+idocupation INTEGER NOT NULL PRIMARY KEY,
+oname Varchar(40),
+osalary Numeric(10,2));
 
-create table Empleado(
-IdEmpleado INTEGER NOT NULL PRIMARY KEY,
-NombreE Varchar(40),
-DireccionE Varchar(60),
-IdOcupacion INTEGER NOT NULL,
-FOREIGN KEY(IdOcupacion) references Ocupacion(IdOcupacion) 
+create table employee(
+idemployee INTEGER NOT NULL PRIMARY KEY,
+ename Varchar(40),
+eadress Varchar(60),
+idocupation INTEGER NOT NULL,
+FOREIGN KEY(idocupation) references ocupation(idocupation) 
 ON DELETE NO ACTION ON UPDATE CASCADE,
-Sex Varchar(1));
+sex Varchar(1));
 
-create table Factura(
-IdFactura INTEGER NOT NULL PRIMARY KEY,
-Fecha timestamp,
-IdClient INTEGER NOT NULL, 
-FOREIGN KEY(IdClient) references Client(IdClient) 
+create table bill(
+idbill INTEGER NOT NULL PRIMARY KEY,
+bdate timestamp,
+idclient Varchar(20), 
+FOREIGN KEY(idclient) references client(idclient) 
 ON DELETE NO ACTION ON UPDATE CASCADE,
-IdEmpleado INTEGER NOT NULL, 
-FOREIGN KEY(IdEmpleado) references Empleado(IdEmpleado) 
+idemployee INTEGER NOT NULL, 
+FOREIGN KEY(idemployee) references employee(idemployee) 
 ON DELETE NO ACTION ON UPDATE CASCADE,
-Subtotal Numeric(12,2),
-Total Numeric(12,2));
+subtotal Numeric(12,2),
+total Numeric(12,2));
 
-create table Detalle(
-IdFactura INTEGER NOT NULL, FOREIGN KEY(IdFactura) references Factura(IdFactura) 
+create table bill_product(
+idbill INTEGER NOT NULL, FOREIGN KEY(idbill) references bill(idbill) 
 ON DELETE NO ACTION ON UPDATE CASCADE,
-IdProduct INTEGER NOT NULL, FOREIGN KEY(IdProduct) references Product(IdProduct) 
+idproduct INTEGER NOT NULL, FOREIGN KEY(idproduct) references product(idproduct) 
 ON DELETE NO ACTION ON UPDATE CASCADE,
-Quantity INTEGER,
-SellPrice Numeric(13,2),
-Total Numeric(13,2));
+quantity INTEGER,
+total Numeric(13,2));
 
 set datestyle to european;

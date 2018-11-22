@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.Random;
 
 import javax.swing.JButton;
@@ -22,10 +23,123 @@ public class Client {
 	private static JTextArea clientAdr = Main.clientAdr;
 	private static JTextField clientName = Main.clientName;
 	private static JComboBox<String> idType = Main.idType;
+	private String idclient;
+	private String cname;
+	private String cadress;
+	private double cmoney;
 	private Bill bill;
+	public static HashMap<String,Client> clients = new HashMap<String,Client>();
 
-	public Client(String action) {
+	private Client(String idclient, String cname, String cadress) {
+		this.setIdclient(idclient);
+		this.cname = cname;
+		this.cadress = cadress;
+		this.setCmoney(0);
+		this.bill = null;
+		Client.clients.put(idclient, this);
+	}
+	
+	public Bill getBill() {
+		return this.bill;
+	}
+	
+	public static void innitClients() {
 		Statement stm = null;
+		String query = "Select * from client";
+		try
+		{
+			stm = connection.createStatement();
+			ResultSet rs = stm.executeQuery(query);
+			while(rs.next()) {
+				String idClient = rs.getString("idclient");
+				String cName = rs.getString("cname");
+				String cAdress = rs.getString("cadress");
+				new Client(idClient,cName,cAdress);
+			}
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try{stm.close();}catch (SQLException e) {e.printStackTrace();}
+		}
+	}
+	
+	public static Client getClient(String idClient,String nationalitie) {
+		Client client = Client.clients.get(nationalitie+idClient);
+		if(client!=null) {
+			Main.cedulaID.setEditable(false);
+			Main.clientAdr.setText(client.cadress);
+			Main.clientAdr.setEditable(false);
+			Main.clientName.setText(client.cname);
+			Main.clientName.setEditable(false);
+			return client;
+		}
+		else
+			JOptionPane.showMessageDialog(Main.frame, "Client does not exists", "Error", JOptionPane.ERROR_MESSAGE);
+		return null;
+	}
+	
+	public static Client addCustomer(String idclient) {
+		String cedula = Main.cedulaID.getText();
+		String name = Main.clientName.getText();
+		String adress = Main.clientAdr.getText();
+		if(!cedula.equals("") && !name.equals("") && !adress.equals("")) {
+			Main.cedulaID.setEditable(false);
+			Main.clientAdr.setEditable(false);
+			Main.clientName.setEditable(false);
+			return new Client(idclient,name,adress);
+		}
+		else
+			JOptionPane.showMessageDialog(Main.frame, "Missing an obligatory field.", "Error", JOptionPane.ERROR_MESSAGE);
+		return null;
+	}
+	
+	public void addProductToBill(int idemployee,int idproduct) {
+		if(Product.products.get(idproduct)!=null) {
+			if(this.bill==null) {
+				this.bill = new Bill(this,Employee.employees.get(idemployee));
+				this.bill.addProduct(idproduct);
+			}
+			else
+				this.bill.addProduct(idproduct);
+
+			Main.productsArea.setText(UserInterface.format);
+			for(int i = 0; i<this.bill.productsToBuy.size() ; i++) {
+				Bill_Product product = this.bill.productsToBuy.get(i);
+				Main.productsArea.append(String.format("\n%1$-30s %2$-30s %3$-30s %4$-30s",product.getProduct().getPdescription(),
+						product.getProduct().getSellprice(),
+						product.getQuantity(),
+						product.getTotal()));
+			}
+		}
+		else
+			JOptionPane.showMessageDialog(Main.frame, "Product does not exists.", "Error", JOptionPane.ERROR_MESSAGE);
+	}
+
+	public String getIdclient() {
+		return idclient;
+	}
+
+	public void setIdclient(String idclient) {
+		this.idclient = idclient;
+	}
+
+	public double getCmoney() {
+		return cmoney;
+	}
+
+	public void setCmoney(double cmoney) {
+		this.cmoney = cmoney;
+	}
+	
+	public String getCName() {
+		return this.cname;
+	}
+	
+	public String getCAdress() {
+		return this.cadress;
+	}
+	
+	/*Statement stm = null;
 		String query;
 		if(connection!=null ) {
 			if(!cedulaID.getText().equals("")) {
@@ -41,7 +155,6 @@ public class Client {
 							cedulaID.setEditable(false);
 							clientName.setEditable(false);
 							clientAdr.setEditable(false);
-							bill = new Bill();
 						}catch(SQLException e) {
 							System.out.println("SQL syntax error!");
 							e.printStackTrace();
@@ -55,40 +168,10 @@ public class Client {
 						JOptionPane.showMessageDialog(Main.frame, "Client does not exist.","Error", JOptionPane.ERROR_MESSAGE);
 				}
 				else {
-					bill = new Bill();
 				}
 			}
 			else
 				JOptionPane.showMessageDialog(Main.frame, "Missing an obligatory field.","Error", JOptionPane.ERROR_MESSAGE);
 		}
-	}
-	
-	public Bill getBill() {
-		return this.bill;
-	}
-	
-	public static boolean getClient() {
-		Statement stm = null;
-		String query = String.format("Select * from Client where IdClient = '%s%d'",idType.getSelectedItem(),Long.valueOf(cedulaID.getText()));
-		try
-		{
-			stm = connection.createStatement();
-			ResultSet rs = stm.executeQuery(query);
-			if(rs.next()) {
-				clientName.setText(rs.getString("NameC"));
-				clientAdr.setText(rs.getString("AdressC"));
-				clientName.setEditable(false);
-				clientAdr.setEditable(false);
-				cedulaID.setEditable(false);
-				return true;
-			}
-		}catch(SQLException e) {
-			e.printStackTrace();
-		}finally {
-			try{stm.close();}catch (SQLException e) {e.printStackTrace();}
-		}
-		return false;
-	}
-	
-	
+*/
 }

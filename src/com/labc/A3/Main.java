@@ -7,6 +7,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 
 public class Main {
 	public static Random rnd = new Random();
@@ -18,11 +19,22 @@ public class Main {
 	public static JComboBox idType;
 	public static JFrame frame;
 	public static JTextArea productsArea;
+	public static JTextPane totalPane;
+	public static double total = 0;
 	
 	public static void main(String[] args) {
 		ConnManager.getConnection();
+		innitStuff();
 		frame = new UserInterface();
 		frame.setVisible(true);
+	}
+	
+	private static void innitStuff(){
+		Provider.innitProviders();
+		Client.innitClients();
+		Product.innitProducts();
+		Ocupation.innitOcupations();
+		Employee.innitEmployees();
 	}
 
 }

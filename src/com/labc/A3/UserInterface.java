@@ -12,9 +12,17 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JTabbedPane;
 import javax.swing.JScrollBar;
+import javax.swing.JTextPane;
+import java.awt.Color;
+import java.awt.SystemColor;
+import java.awt.Font;
 
 public class UserInterface extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public JFrame frame = this;
 	private JTabbedPane tabbedPane;
 	private JPanel contentPane;
@@ -23,7 +31,7 @@ public class UserInterface extends JFrame {
 	private JComboBox<String> comboBox;
 	private JTextArea productsTA, adressTF, textArea_2, textArea_3, idProductTA, employeeIDTA, nameTA;
 	private JButton billButton, resetButton, clearButton, addCustButton;
-	public static String format = String.format("%1$-30s %2$-30s %3$-30s %4$-30s|","Product","Price","Quantity","Total");
+	public static String format = String.format("%1$-30s %2$-30s %3$-30s %4$-30s","Product","Price","Quantity","Total");
 
 	/**
 	 * Launch the application.
@@ -87,6 +95,7 @@ public class UserInterface extends JFrame {
 		panel.add(productsTA);
 		
 		adressTF = new JTextArea();
+		adressTF.setLineWrap(true);
 		adressTF.setWrapStyleWord(true);
 		adressTF.setToolTipText("Insert direction");
 		adressTF.setBounds(251, 30, 211, 61);
@@ -149,7 +158,7 @@ public class UserInterface extends JFrame {
 		employeeIDTA.setBounds(523, 11, 106, 20);
 		panel.add(employeeIDTA);
 		
-		employeeIDTF = new JTextField();
+		employeeIDTF = new JTextField("34095746");
 		employeeIDTF.setColumns(10);
 		employeeIDTF.setBounds(633, 12, 172, 20);
 		Main.employeeID = employeeIDTF;
@@ -172,6 +181,14 @@ public class UserInterface extends JFrame {
 		JButton cancelButton = new JButton("CANCEL");
 		cancelButton.setBounds(409, 508, 91, 46);
 		panel.add(cancelButton);
+		
+		JTextPane totalPane = new JTextPane();
+		totalPane.setText("TOTAL:\n\t"+Main.total);
+		totalPane.setFont(new Font("Cambria Math", Font.BOLD, 28));
+		totalPane.setBackground(SystemColor.menu);
+		totalPane.setBounds(523, 52, 282, 94);
+		Main.totalPane = totalPane;
+		panel.add(totalPane);
 	}
 	
 	private void addActions(){
@@ -184,21 +201,34 @@ public class UserInterface extends JFrame {
 		employeeIDTF.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Main.employeeID.setEditable(false);
+				try {
+					Integer.valueOf(employeeIDTF.getText());
+					Main.employeeID.setEditable(false);
+				}catch(NumberFormatException o) {
+					employeeIDTF.setText(null);
+					JOptionPane.showMessageDialog(Main.frame, o+"\nPlease insert a valid input", "Warning", JOptionPane.WARNING_MESSAGE);
+				}
 			}});
 		
 		cedulaID.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				Bill.currentClient = new Client("cedula");
+				Client client = Client.getClient(cedulaID.getText(),(String)comboBox.getSelectedItem());
+				Bill.client = client;
 			}});
 				
 		idProductTF.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if(Bill.currentClient!=null)
-					new Product(Long.valueOf(idProductTF.getText()),Bill.currentClient.getBill());
+				if(Bill.client!=null) {
+					try {
+						Bill.client.addProductToBill(Integer.valueOf(employeeIDTF.getText()),Integer.valueOf(idProductTF.getText()));
+					}catch(NumberFormatException e) {
+						JOptionPane.showMessageDialog(Main.frame, e+"\nPlease insert a valid input", "Warning", JOptionPane.WARNING_MESSAGE);
+					}
+				}
 				else
-					JOptionPane.showMessageDialog(Main.frame,"Add client first.","Error",JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(Main.frame, "Please do things correctly >.>", "Warning", JOptionPane.WARNING_MESSAGE);
+				idProductTF.setText(null);
 			}
 		});
 	}
@@ -208,15 +238,29 @@ class ButtonAction implements ActionListener{
 	public static String format;
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		System.out.println(e.getActionCommand());
 		if(e.getActionCommand().equals("BILL")) {
-			
+			if(Bill.client!=null && Bill.client.getBill()!=null) {
+				if(Bill.generateBill(Bill.client.getBill())) {
+					Bill.client = null;
+					Main.cedulaID.setText(null);
+					Main.cedulaID.setEditable(true);
+					Main.clientName.setText(null);
+					Main.clientName.setEditable(true);
+					Main.clientAdr.setText(null);
+					Main.clientAdr.setEditable(true);
+					Main.productsArea.setText(format);
+				}		
+			}
+			else
+				JOptionPane.showMessageDialog(Main.frame, "Please dude behave yourself!", "WARNING", JOptionPane.WARNING_MESSAGE);
 		}
 		else if(e.getActionCommand().equalsIgnoreCase("ADD CUSTOMER")) {
-			Bill.currentClient = new Client("cust");
+			Client client = Client.addCustomer((String)Main.idType.getSelectedItem()+Main.cedulaID.getText());
+			Bill.client = client;
 		}
 		
 		else if(e.getActionCommand().equals("RESET")) {
+			Bill.client = null;
 			Main.cedulaID.setText(null);
 			Main.cedulaID.setEditable(true);
 			Main.clientName.setText(null);
@@ -228,6 +272,7 @@ class ButtonAction implements ActionListener{
 			Main.employeeID.setEditable(true);
 		}
 		else if(e.getActionCommand().equals("CLEAR")) {
+			Bill.client = null;
 			Main.cedulaID.setText(null);
 			Main.cedulaID.setEditable(true);
 			Main.clientName.setText(null);
