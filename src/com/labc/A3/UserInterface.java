@@ -1,27 +1,31 @@
 package com.labc.A3;
 
+import java.awt.BorderLayout;
+import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.SystemColor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JComboBox;
-import javax.swing.JTextField;
-import javax.swing.JTextArea;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.JTabbedPane;
 import javax.swing.JScrollBar;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.border.EmptyBorder;
 import java.awt.Color;
-import java.awt.SystemColor;
-import java.awt.Font;
+import javax.swing.SwingConstants;
 
 public class UserInterface extends JFrame {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	public JFrame frame = this;
 	private JTabbedPane tabbedPane;
@@ -32,6 +36,27 @@ public class UserInterface extends JFrame {
 	private JTextArea productsTA, adressTF, textArea_2, textArea_3, idProductTA, employeeIDTA, nameTA;
 	private JButton billButton, resetButton, clearButton, addCustButton;
 	public static String format = String.format("%1$-30s %2$-30s %3$-30s %4$-30s","Product","Price","Quantity","Total");
+	private JTextField Esclavo2;
+	private JTextField Esclavito1;
+	private JTextField Esclavito2;
+	private JTextField Esclavito3;
+	private JButton InsertEsclavito;
+	private JTextField textField;
+	private JTextField textField_1;
+	private JTextArea textArea;
+	private JComboBox comboBox_1;
+	private JTextField textField_2;
+	private JTextField textField_3;
+	private JTextField textField_4;
+	private JButton button;
+	private JTextField textField_5;
+	private JTextArea plox;
+	private JComboBox comboBox_2;
+	private JTextField textField_6;
+	private JTextField textField_7;
+	private JTextField textField_8;
+	private JButton button_1;
+	private JTextArea txtrConsultas;
 
 	/**
 	 * Launch the application.
@@ -62,12 +87,213 @@ public class UserInterface extends JFrame {
 		innitBillingTab(panel);
 		
 		JPanel panel_1 = new JPanel();
+		panel_1.setVisible(false);
 		tabbedPane.addTab("ADMINISTRATOR", null, panel_1, null);
+		panel_1.setLayout(null);
+		Main.adminpanel = panel_1;
+		
+		JComboBox Esclavo1 = new JComboBox();
+		Esclavo1.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 15));
+		Esclavo1.setBackground(Color.WHITE);
+		Esclavo1.setBounds(40, 68, 136, 39);
+		panel_1.add(Esclavo1);
+		Esclavo1.addItem("Nombre");
+		addProviderstoGui(Esclavo1);
+		
+		JTextArea txtrProveedores = new JTextArea();
+		txtrProveedores.setEditable(false);
+		txtrProveedores.setFont(new Font("Monospaced", Font.PLAIN, 16));
+		txtrProveedores.setBackground(SystemColor.menu);
+		txtrProveedores.setText("Proveedores:");
+		txtrProveedores.setBounds(40, 40, 136, 26);
+		panel_1.add(txtrProveedores);
+		
+		Esclavo2 = new JTextField();
+		Esclavo2.setBounds(186, 68, 90, 39);
+		panel_1.add(Esclavo2);
+		Esclavo2.setColumns(10);
+		Esclavo2.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if(Esclavo2.getText().equalsIgnoreCase("insert")) {
+				Esclavo2.setEnabled(false);
+					Esclavito1.setVisible(true);
+						Esclavito2.setVisible(true);
+							Esclavito3.setVisible(true);
+								InsertEsclavito.setVisible(true);
+				}	
+				else if(Esclavo2.getText().equalsIgnoreCase("delete")) {
+					Provider.papocochino((String) Esclavo1.getSelectedItem());
+				}
+			}
+			
+		});
+		
+		
+		Esclavito1 = new JTextField();
+		Esclavito1.setVisible(false);
+		Esclavito1.setToolTipText("Insert Code");
+		Esclavito1.setBounds(40, 118, 62, 39);
+		panel_1.add(Esclavito1);
+		Esclavito1.setColumns(10);
+		
+		Esclavito2 = new JTextField();
+		Esclavito2.setVisible(false);
+		Esclavito2.setToolTipText("Insert Name");
+		Esclavito2.setColumns(10);
+		Esclavito2.setBounds(112, 118, 62, 39);
+		panel_1.add(Esclavito2);
+		
+		Esclavito3 = new JTextField();
+		Esclavito3.setVisible(false);
+		Esclavito3.setToolTipText("Insert address");
+		Esclavito3.setColumns(10);
+		Esclavito3.setBounds(188, 118, 90, 39);
+		panel_1.add(Esclavito3);
+		
+		InsertEsclavito = new JButton("Insert");
+		InsertEsclavito.setVisible(false);
+		InsertEsclavito.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Provider.papolimpio(Esclavito2.getText(), "Provider",Integer.valueOf (Esclavito1.getText()), Esclavito3.getText());
+				Esclavito1.setText(null);
+				Esclavito1.setVisible(false);
+				Esclavito2.setText(null);
+				Esclavito2.setVisible(false);
+				Esclavito3.setText(null);
+				Esclavito3.setVisible(false);
+				InsertEsclavito.setVisible(false);
+				Esclavo2.setText(null);
+				Esclavo2.setEnabled(true);
+			}
+		});
+		InsertEsclavito.setBounds(40, 168, 236, 23);
+		panel_1.add(InsertEsclavito);
+		
+		textField = new JTextField();
+		textField.setBounds(355, 118, 407, 415);
+		panel_1.add(textField);
+		textField.setColumns(10);
+		
+		textField_1 = new JTextField();
+		textField_1.setToolTipText("Ci");
+		textField_1.setColumns(10);
+		textField_1.setBounds(40, 289, 64, 39);
+		panel_1.add(textField_1);
+		
+		textArea = new JTextArea();
+		textArea.setEditable(false);
+		textArea.setText("Empleados:");
+		textArea.setFont(new Font("Monospaced", Font.PLAIN, 16));
+		textArea.setBackground(SystemColor.menu);
+		textArea.setBounds(40, 202, 136, 26);
+		panel_1.add(textArea);
+		
+		comboBox_1 = new JComboBox();
+		comboBox_1.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 15));
+		comboBox_1.setBackground(Color.WHITE);
+		comboBox_1.setBounds(40, 239, 136, 39);
+		panel_1.add(comboBox_1);
+		
+		textField_2 = new JTextField();
+		textField_2.setColumns(10);
+		textField_2.setBounds(186, 239, 90, 39);
+		panel_1.add(textField_2);
+		
+		textField_3 = new JTextField();
+		textField_3.setToolTipText("Name");
+		textField_3.setColumns(10);
+		textField_3.setBounds(114, 289, 62, 39);
+		panel_1.add(textField_3);
+		
+		textField_4 = new JTextField();
+		textField_4.setColumns(10);
+		textField_4.setBounds(186, 289, 90, 39);
+		panel_1.add(textField_4);
+		
+		button = new JButton("Insert");
+		button.setBounds(40, 339, 236, 23);
+		panel_1.add(button);
+		
+		textField_5 = new JTextField();
+		textField_5.setToolTipText("Ci");
+		textField_5.setColumns(10);
+		textField_5.setBounds(40, 460, 64, 39);
+		panel_1.add(textField_5);
+		
+		plox = new JTextArea();
+		plox.setEditable(false);
+		plox.setText("Productos:");
+		plox.setFont(new Font("Monospaced", Font.PLAIN, 16));
+		plox.setBackground(SystemColor.menu);
+		plox.setBounds(40, 373, 136, 26);
+		panel_1.add(plox);
+		
+		comboBox_2 = new JComboBox();
+		comboBox_2.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 15));
+		comboBox_2.setBackground(Color.WHITE);
+		comboBox_2.setBounds(40, 410, 136, 39);
+		panel_1.add(comboBox_2);
+		
+		textField_6 = new JTextField();
+		textField_6.setColumns(10);
+		textField_6.setBounds(186, 410, 90, 39);
+		panel_1.add(textField_6);
+		
+		textField_7 = new JTextField();
+		textField_7.setToolTipText("Name");
+		textField_7.setColumns(10);
+		textField_7.setBounds(114, 460, 62, 39);
+		panel_1.add(textField_7);
+		
+		textField_8 = new JTextField();
+		textField_8.setColumns(10);
+		textField_8.setBounds(186, 460, 90, 39);
+		panel_1.add(textField_8);
+		
+		button_1 = new JButton("Insert");
+		button_1.setBounds(40, 510, 236, 23);
+		panel_1.add(button_1);
+		
+		txtrConsultas = new JTextArea();
+		txtrConsultas.setEditable(false);
+		txtrConsultas.setText("                        Consultas");
+		txtrConsultas.setFont(new Font("Stencil", Font.PLAIN, 22));
+		txtrConsultas.setBackground(SystemColor.menu);
+		txtrConsultas.setBounds(355, 68, 407, 39);
+		panel_1.add(txtrConsultas);
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		
 	}
-	
+	private void addProviderstoGui(JComboBox Box) {
+		if(ConnManager.getConnection()!=null) {
+			Statement stm = null;
+			String query = "select Pname from provider;";
+			try {
+				stm = ConnManager.getConnection().createStatement();
+				ResultSet rs = stm.executeQuery(query);
+				while(rs.next()) {
+					String Pname = rs.getString("Pname");
+					Box.addItem(Pname);
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}finally {
+				if(stm!=null) {
+					try {
+						stm.close();
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+			
+		}
+}
 	private void innitBillingTab(JPanel panel) {
 		ButtonAction.format = UserInterface.format;
 		panel.setLayout(null);
@@ -197,6 +423,7 @@ public class UserInterface extends JFrame {
 		resetButton.addActionListener(ba);
 		addCustButton.addActionListener(ba);
 		clearButton.addActionListener(ba);
+		
 
 		employeeIDTF.addActionListener(new ActionListener(){
 			@Override
@@ -281,5 +508,11 @@ class ButtonAction implements ActionListener{
 			Main.clientAdr.setEditable(true);
 			Main.productsArea.setText(format);
 		}
+		else if(e.getActionCommand().equals("CRUD")) {
+			Main.CRUD.setVisible(false);
+			Main.adminpanel.setVisible(true);
+			
+		}
 	}
+	
 }

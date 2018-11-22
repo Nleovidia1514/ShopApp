@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 
+import javax.swing.JOptionPane;
+
 public class Provider {
 	private static Connection connection = ConnManager.getConnection();
 	private int idprovider;
@@ -46,7 +48,52 @@ public class Provider {
 			}
 		}
 	}
-
+	public static void papocochino(String Pname) {
+		if(ConnManager.getConnection()!=null) {
+			Statement stm = null;
+			String query = "delete from provider where Pname ='"+ Pname+"'";
+			try {
+				stm = ConnManager.getConnection().createStatement();
+				stm.execute(query);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}finally {
+				if(stm!=null) {
+					try {
+						stm.close();
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}	
+			
+	}
+	public static void papolimpio(String Pname,String Tablename,int idPapo,String Address) {
+		if(ConnManager.getConnection()!=null) {
+			Statement stm = null;
+			String query = String.format("insert into %s values (%d,'%s','%s')", Tablename,idPapo,Pname,Address);
+			try {
+				stm = ConnManager.getConnection().createStatement();
+				stm.execute(query);
+				JOptionPane.showMessageDialog(Main.frame, "Tu papo esta listo", "Congrats Osc", JOptionPane.INFORMATION_MESSAGE);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}finally {
+				if(stm!=null) {
+					try {
+						stm.close();
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	}
 	public int getIdprovider() {
 		return idprovider;
 	}

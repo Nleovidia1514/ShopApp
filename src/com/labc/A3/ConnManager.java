@@ -19,7 +19,7 @@ public class ConnManager {
 			}
 			try
 			{
-				connection = DriverManager.getConnection("jdbc:postgresql:testing1", "postgres", "26375969");
+				connection = DriverManager.getConnection("jdbc:postgresql:perra", "postgres", "asdasd");
 			}catch(SQLException e) {
 				System.out.println("Connection failed!");
 				e.printStackTrace();

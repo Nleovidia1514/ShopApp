@@ -3,15 +3,17 @@ package com.labc.A3;
 import java.text.SimpleDateFormat;
 import java.util.Random;
 
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 
 public class Main {
 	public static Random rnd = new Random();
-	public static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyy HH:mm:ss");
+	public static SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyy HH:mm:ss");
 	public static JTextField employeeID;
 	public static JTextField cedulaID;
 	public static JTextField clientName;
@@ -21,6 +23,8 @@ public class Main {
 	public static JTextArea productsArea;
 	public static JTextPane totalPane;
 	public static double total = 0;
+	public static JButton CRUD;
+	public static JPanel adminpanel;
 	
 	public static void main(String[] args) {
 		ConnManager.getConnection();
