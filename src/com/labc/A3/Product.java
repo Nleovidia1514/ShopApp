@@ -6,8 +6,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 
-import javax.swing.JOptionPane;
-
 public class Product {
 	private static Connection connection = ConnManager.getConnection();
 	private int idproduct;
@@ -86,29 +84,6 @@ public class Product {
 				}
 			}
 		}*/
-	private boolean checkIfProductExists(long productID) {
-		Statement stm = null;
-		String query = String.format("Select * from Product where IdProduct = %d", productID);
-		try {
-			stm = connection.createStatement();
-			ResultSet rs = stm.executeQuery(query);
-			if(rs.next())
-				return true;
-			else
-				JOptionPane.showMessageDialog(Main.frame, "Product does not exists.", "Error",JOptionPane.ERROR_MESSAGE);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}finally {
-			if(stm!=null) {
-				try {
-					stm.close();
-				}catch(Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return false;
-	}
 
 	public int getIdproduct() {
 		return idproduct;

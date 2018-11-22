@@ -9,9 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 
 public class Bill {
 	public static Client client;
@@ -19,9 +17,6 @@ public class Bill {
 	private static Connection connection = ConnManager.getConnection();
 	private Random rnd = Main.rnd;
 	private SimpleDateFormat sdf = Main.sdf;
-	private JTextField employeeID = Main.employeeID;
-	private JTextField cedulaID = Main.cedulaID;
-	private JComboBox idType = Main.idType;
 	private int billNmbr = 0;
 	public HashMap<Integer,Bill_Product> productsInBill;
 	public ArrayList<Bill_Product> productsToBuy = new ArrayList<Bill_Product>();
@@ -38,8 +33,12 @@ public class Bill {
 				String query = "Select idbill from bill where idbill = "+this.billNmbr;
 				stm = connection.createStatement();
 				ResultSet rs = stm.executeQuery(query);
-				while (rs.next())
+				while (rs.next()) {
 					this.billNmbr = rnd.nextInt(10000);
+					query = "Select idbill from bill where idbill = "+this.billNmbr;
+					rs = stm.executeQuery(query);
+				}
+					
 				this.productsInBill = new HashMap<Integer,Bill_Product>();
 				this.owner = client;
 				this.employee = employee;
@@ -92,19 +91,24 @@ public class Bill {
 					query = String.format("Update bill set subtotal = subtotal +"+product.getTotal()+" where idbill = %d;",
 								bill.billNmbr);
 					stm.execute(query);
+					query = String.format("Update product set stock = stock-%d where idproduct = %d;",product.getQuantity(),
+							product.getProduct().getIdproduct());
+					stm.execute(query);
 				}
 				query = String.format("Update bill set total = subtotal+(subtotal*+"+Bill.TAX+") where idbill = %d;",bill.billNmbr);
 				stm.execute(query);
 				double moneyToPay = 0;
-				String cMoney = JOptionPane.showInputDialog(Main.frame, "Enter the amount of currency you received");
-				double cmoney = Double.valueOf(cMoney);
+				//String cMoney = JOptionPane.showInputDialog(Main.frame, "Enter the amount of currency you received");
+				double cMoney;
 				query = String.format("Select total from bill where idbill = %d;",bill.billNmbr);
 				ResultSet rs1 = stm.executeQuery(query);
 				if(rs1.next())
 					moneyToPay = rs1.getDouble("total");
-				
-				if(cmoney>=moneyToPay) {
+				cMoney = moneyToPay;
+				if(cMoney>=moneyToPay) {
 					JOptionPane.showMessageDialog(Main.frame, "Thanks for your purchase!", "THANKS", JOptionPane.INFORMATION_MESSAGE);
+					Main.total = 0;
+					Main.totalPane.setText("TOTAL:\n\t"+Main.total);
 					return true;
 				}
 				else {

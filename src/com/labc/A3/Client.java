@@ -1,28 +1,14 @@
 package com.labc.A3;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
-import java.util.Random;
-
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 
 public class Client {
 	private static Connection connection = ConnManager.getConnection();
-	private static JTextField cedulaID = Main.cedulaID;
-	private static JTextArea clientAdr = Main.clientAdr;
-	private static JTextField clientName = Main.clientName;
-	private static JComboBox<String> idType = Main.idType;
 	private String idclient;
 	private String cname;
 	private String cadress;
