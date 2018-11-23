@@ -85,17 +85,32 @@ public class Client {
 				this.bill = new Bill(this,Employee.employees.get(idemployee));
 				this.bill.addProduct(idproduct);
 			}
-			else
+			else 
 				this.bill.addProduct(idproduct);
-
-			Main.productsArea.setText(UserInterface.format);
-			for(int i = 0; i<this.bill.productsToBuy.size() ; i++) {
-				Bill_Product product = this.bill.productsToBuy.get(i);
-				Main.productsArea.append(String.format("\n%1$-30s %2$-30s %3$-30s %4$-30s",product.getProduct().getPdescription(),
+			
+			Bill_Product product = this.bill.productsInBill.get(idproduct);
+			if(product!=null && product.getQuantity()>1){
+				boolean ok = false;
+				for(int i = 0; i<Main.productsArea.getColumnCount(); i++)
+					for(int j = 0; j<Main.productsArea.getRowCount(); j++) {
+						if(Main.productsArea.getValueAt(j, i).equals(product.getProduct().getPdescription())) {
+							Main.productsArea.setValueAt(product.getQuantity(),j,2);
+							Main.productsArea.setValueAt(product.getTotal()+(product.getTotal()*Bill.TAX),j,3);
+							ok = true;
+							break;
+						}
+						if(ok)
+							break;
+					}
+			}
+			else if(product != null) {
+				Object[] newRow = {product.getProduct().getPdescription(),
 						product.getProduct().getSellprice(),
 						product.getQuantity(),
-						product.getTotal()));
+						product.getTotal()+(product.getTotal()*Bill.TAX)};
+				Main.productsArea.addRow(newRow);
 			}
+			
 		}
 		else
 			JOptionPane.showMessageDialog(Main.frame, "Product does not exists.", "Error", JOptionPane.ERROR_MESSAGE);

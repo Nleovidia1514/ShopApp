@@ -16,9 +16,9 @@ buyprice Numeric(10,2),
 sellprice Numeric(10,2),
 restock INTEGER,
 stock  INTEGER,
-idprovider INTEGER NOT NULL,
+idprovider INTEGER,
 FOREIGN KEY (idprovider) references provider(idprovider)
-ON DELETE NO ACTION ON UPDATE CASCADE);
+ON DELETE SET NULL ON UPDATE CASCADE);
 
 create table ocupation(
 idocupation INTEGER NOT NULL PRIMARY KEY,
@@ -29,9 +29,9 @@ create table employee(
 idemployee INTEGER NOT NULL PRIMARY KEY,
 ename Varchar(40),
 eadress Varchar(60),
-idocupation INTEGER NOT NULL,
+idocupation INTEGER,
 FOREIGN KEY(idocupation) references ocupation(idocupation) 
-ON DELETE NO ACTION ON UPDATE CASCADE,
+ON DELETE SET NULL ON UPDATE CASCADE,
 sex Varchar(1));
 
 create table bill(
@@ -39,18 +39,20 @@ idbill INTEGER NOT NULL PRIMARY KEY,
 bdate timestamp,
 idclient Varchar(20), 
 FOREIGN KEY(idclient) references client(idclient) 
-ON DELETE NO ACTION ON UPDATE CASCADE,
-idemployee INTEGER NOT NULL, 
+ON DELETE SET NULL ON UPDATE CASCADE,
+idemployee INTEGER, 
 FOREIGN KEY(idemployee) references employee(idemployee) 
-ON DELETE NO ACTION ON UPDATE CASCADE,
+ON DELETE SET NULL ON UPDATE CASCADE,
 subtotal Numeric(12,2),
 total Numeric(12,2));
 
 create table bill_product(
-idbill INTEGER NOT NULL, FOREIGN KEY(idbill) references bill(idbill) 
-ON DELETE NO ACTION ON UPDATE CASCADE,
-idproduct INTEGER NOT NULL, FOREIGN KEY(idproduct) references product(idproduct) 
-ON DELETE NO ACTION ON UPDATE CASCADE,
+idbill INTEGER, 
+FOREIGN KEY(idbill) references bill(idbill) 
+ON DELETE SET NULL ON UPDATE CASCADE,
+idproduct INTEGER, 
+FOREIGN KEY(idproduct) references product(idproduct) 
+ON DELETE SET NULL ON UPDATE CASCADE,
 quantity INTEGER,
 total Numeric(13,2));
 

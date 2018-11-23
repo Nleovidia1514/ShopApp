@@ -48,6 +48,7 @@ insert into Product values (5205,'Fallout 76 BETA',1000.00,7000.00,0,10,65935);
 insert into Product values (5206,'Dark Souls III',500.00,3000.00,0,14,81094);
 insert into Product values (2207,'Cable usb simple',100.00,300.00,60,162,28687);
 insert into Product values (2208,'Compartimiento para DVD',50.00,480.15,12,27,43251);
+insert into product values (2020,'Niña esclava de 14 años',0,1000,2,3,43251);
 
 
 

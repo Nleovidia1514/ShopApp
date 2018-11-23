@@ -23,15 +23,14 @@ public class Bill_Product {
 				bill.productsToBuy.add(idk);
 				idk.product.setStocked(idk.product.getStocked()-1);
 				Main.total = Main.total+(idk.total+(idk.total*Bill.TAX));
-				Main.totalPane.setText("TOTAL:\n\t"+Main.total);
 			}
 			else {
 				bill.productsInBill.get(idproduct).setQuantity(bill.productsInBill.get(idproduct).getQuantity() + 1);
 				bill.productsInBill.get(idproduct).setTotal(bill.productsInBill.get(idproduct).getTotal() + bill.productsInBill.get(idproduct).product.getSellprice());
 				bill.productsInBill.get(idproduct).product.setStocked(bill.productsInBill.get(idproduct).product.getStocked()-1);
-				Main.total = Main.total+(bill.productsInBill.get(idproduct).getProduct().getSellprice()+(bill.productsInBill.get(idproduct).getProduct().getSellprice()*Bill.TAX));
-				Main.totalPane.setText("TOTAL:\n\t"+Main.total);
+				Main.total = Main.total+(bill.productsInBill.get(idproduct).getProduct().getSellprice()+(bill.productsInBill.get(idproduct).getProduct().getSellprice()*Bill.TAX));	
 			}
+			Main.totalPane.setText("TOTAL:\n\t"+Main.total);
 		}
 		else
 			JOptionPane.showMessageDialog(Main.frame, "Out of existence.", "SORRY", JOptionPane.WARNING_MESSAGE);

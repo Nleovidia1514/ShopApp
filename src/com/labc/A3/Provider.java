@@ -6,7 +6,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
 
 public class Provider {
 	private static Connection connection = ConnManager.getConnection();
@@ -69,18 +73,16 @@ public class Provider {
 				}
 			}
 		}	
-			
 	}
-	public static void papolimpio(String Pname,String Tablename,int idPapo,String Address) {
+	public static void papolimpio(String Pname,int idPapo,String Address) {
 		if(ConnManager.getConnection()!=null) {
 			Statement stm = null;
-			String query = String.format("insert into %s values (%d,'%s','%s')", Tablename,idPapo,Pname,Address);
+			String query = String.format("insert into %s values (%d,'%s','%s')", "provider",idPapo,Pname,Address);
 			try {
 				stm = ConnManager.getConnection().createStatement();
 				stm.execute(query);
 				JOptionPane.showMessageDialog(Main.frame, "Tu papo esta listo", "Congrats Osc", JOptionPane.INFORMATION_MESSAGE);
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}finally {
 				if(stm!=null) {
@@ -92,6 +94,35 @@ public class Provider {
 					}
 				}
 			}
+		}
+	}
+	public static void papoApestoso(JComboBox Box, JTextArea Area) {
+		Statement stm = null;
+		String query = null;
+		if(connection != null) {
+			try {
+				stm = connection.createStatement();
+				if(Box.getSelectedIndex()==0)
+					query = "Select * from provider";
+				else
+					query = "Select * from provider where pname = '"+(String)Box.getSelectedItem()+"';";
+				ResultSet rs = stm.executeQuery(query);
+				Area.setText("PROVIDER ID\tPROVIDER NAME\tPROVIDER ADRESS\n");
+				while(rs.next()) {
+					String toShow = rs.getInt(1)+"\t"+rs.getString(2)+"\t"+rs.getString(3)+"\n";
+					Area.append(toShow);
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}finally {
+				if(stm!=null) {
+					try {
+						stm.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}	
 		}
 	}
 	public int getIdprovider() {
