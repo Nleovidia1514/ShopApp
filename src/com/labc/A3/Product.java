@@ -6,7 +6,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 
-public class Product {
+import javax.swing.JComboBox;
+import javax.swing.JTextArea;
+import javax.swing.table.DefaultTableModel;
+
+public class Product{
 	private static Connection connection = ConnManager.getConnection();
 	private int idproduct;
 	private String pdescription;
@@ -47,7 +51,52 @@ public class Product {
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
+			}finally {
+				if(stm!=null) {
+					try {
+						stm.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
 			}
+		}
+	}
+	
+	public static void selectFromProduct(JComboBox Box, DefaultTableModel productsDtm) {
+		Statement stm = null;
+		String query;
+		if(connection!=null) {
+			try {
+				stm = connection.createStatement();
+				if(Box.getSelectedIndex()==0 || Box.getSelectedItem().equals("Products"))
+					query = "Select * from product";
+				else
+					query = "Select * from product where idproduct = "+Box.getSelectedItem()+";";
+				ResultSet rs = stm.executeQuery(query);
+				productsDtm.setRowCount(0);
+				while(rs.next()) {
+					try{
+						Object[] newRow = {rs.getInt(1),rs.getString(2),rs.getDouble(3),rs.getDouble(4),rs.getInt(5),
+								rs.getInt(6),Provider.providers.get(rs.getInt(7)).getPname()};
+						productsDtm.addRow(newRow);
+					}catch(NullPointerException e) {
+						Object[] newRow = {rs.getInt(1),rs.getString(2),rs.getDouble(3),rs.getDouble(4),rs.getInt(5),
+								rs.getInt(6),"PROVIDER REMOVED"};
+						productsDtm.addRow(newRow);
+					}
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}finally {
+				if(stm!=null) {
+					try {
+						stm.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}	
 		}
 	}
 	/*if(connection!=null) {
@@ -140,4 +189,5 @@ public class Product {
 	public void setProvider(Provider provider) {
 		this.provider = provider;
 	}
+
 }

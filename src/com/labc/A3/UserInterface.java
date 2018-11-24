@@ -22,8 +22,16 @@ import javax.swing.border.EmptyBorder;
 import java.awt.Color;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+import java.awt.ComponentOrientation;
+import java.awt.Dimension;
+import java.awt.Component;
+import java.awt.BorderLayout;
 
-public class UserInterface extends JFrame {
+public class UserInterface extends JFrame implements Runnable {
+	public UserInterface() {
+	}
 
 	public JFrame frame = this;
 	private JTabbedPane tabbedPane;
@@ -35,24 +43,20 @@ public class UserInterface extends JFrame {
 	public static String format = String.format("%1$-30s %2$-30s %3$-30s %4$-30s","Product","Price","Quantity","Total");
 	private JTextField Esclavo2,Esclavito1,Esclavito2,Esclavito3;
 	private JButton InsertEsclavito;
-	private JTextArea textArea;
-	private JComboBox Mano1,Manito4,Manito5;
+	private JComboBox<Object> Mano1,Manito4,Manito5;
 	private JTextField Mano2,Manito1,Manito2,Manito3;
 	private JButton InsertManito;
-	private JTextField Perrito1;
-	private JTextArea plox;
-	private JComboBox Perro1, perrito7;
-	private JTextField Perro2;
-	private JTextField Perrito2;
-	private JTextField Perrito3;
+	private JComboBox<String> perrito7;
+	private JTextField Perrito1,Perrito2,Perrito3,perrito4,perrito5;
 	private JButton InsertPerrito;
-	private JTextArea txtrConsultas, queryArea;
-	private JTextField perrito4;
-	private JTextField perrito5;
-	private JTextField perrito6;
+	private JTextArea txtrConsultas;
 	private JTable table;
 	private JButton cancelButton;
-
+	private JPanel panel_3;
+	private JScrollPane scrollPane;
+	private JTable queryTable;
+	private JScrollPane scrollPane_1;
+	private Thread swing;
 	/**
 	 * Launch the application.
 
@@ -61,11 +65,7 @@ public class UserInterface extends JFrame {
 	 * @return 
 	 */
 	
-	public UserInterface() {
-		innitGui();
-		addActions();
-	}
-	
+	@SuppressWarnings("serial")
 	public void innitGui() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 858, 631);
@@ -85,86 +85,137 @@ public class UserInterface extends JFrame {
 		tabbedPane.addTab("BILLING", null, panel, null);
 		innitBillingTab(panel);
 		
-		JPanel panel_2 = new JPanel();
-		panel_2.setBounds(35, 160, 768, 336);
-		panel.add(panel_2);
-		
-		table = new JTable();
-		DefaultTableModel dtm = new DefaultTableModel(
-				new Object[][] {
-					{"  PRODUCT", "  Price", "  Quantity", "  Total"},
-				},
-				new String[] {
-					" Product", " Price", "  Quantity", "  Total"
-				}
-			) {
-				Class[] columnTypes = new Class[] {
-					String.class, Object.class, Object.class, Object.class
-				};
-				public Class getColumnClass(int columnIndex) {
-					return columnTypes[columnIndex];
-				}
-				boolean[] columnEditables = new boolean[] {
-					false, false, false, false
-				};
-				public boolean isCellEditable(int row, int column) {
-					return columnEditables[column];
-				}
-			};
-		table.setModel(dtm);
-		table.getColumnModel().getColumn(0).setResizable(false);
-		table.getColumnModel().getColumn(0).setPreferredWidth(305);
-		table.getColumnModel().getColumn(1).setResizable(false);
-		table.getColumnModel().getColumn(1).setPreferredWidth(176);
-		table.getColumnModel().getColumn(2).setResizable(false);
-		table.getColumnModel().getColumn(2).setPreferredWidth(64);
-		table.getColumnModel().getColumn(3).setResizable(false);
-		table.getColumnModel().getColumn(3).setPreferredWidth(176);
-		Main.productsArea = dtm;
-		panel_2.add(table);
-		
 		JPanel panel_1 = new JPanel();
 		panel_1.setVisible(false);
 		tabbedPane.addTab("ADMINISTRATOR", null, panel_1, null);
 		panel_1.setLayout(null);
 		Main.adminpanel = panel_1;
 		
-		JComboBox Esclavo1 = new JComboBox();
+		JComboBox<Object> Esclavo1 = new JComboBox<Object>();
 		Esclavo1.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 15));
 		Esclavo1.setBackground(Color.WHITE);
-		Esclavo1.setBounds(40, 68, 136, 39);
+		Esclavo1.setBounds(10, 48, 136, 39);
 		panel_1.add(Esclavo1);
-		Esclavo1.addItem("Nombre");
+		Esclavo1.addItem("----");
+		Esclavo1.addItem("Providers");
+		Esclavo1.addItem("Employees");
+		Esclavo1.addItem("Products");
+		Esclavo1.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if(Esclavo1.getSelectedItem().equals("Providers"))
+					fillBoxes("pname",Mano1,"provider");
+				else if(Esclavo1.getSelectedItem().equals("Employees"))
+					fillBoxes("idemployee",Mano1,"employee");
+				else if(Esclavo1.getSelectedItem().equals("Products"))
+					fillBoxes("idproduct",Mano1,"product");
+				else if(Esclavo1.getSelectedItem().equals("----")) {
+					Mano1.removeAllItems();
+					Mano1.addItem("----");
+				}
+					
+			}
+		});
 		
-		JTextArea txtrProveedores = new JTextArea();
-		txtrProveedores.setEditable(false);
-		txtrProveedores.setFont(new Font("Monospaced", Font.PLAIN, 16));
-		txtrProveedores.setBackground(SystemColor.menu);
-		txtrProveedores.setText("Proveedores:");
-		txtrProveedores.setBounds(40, 40, 136, 26);
-		panel_1.add(txtrProveedores);
-		
+		DefaultTableModel ProvidersDtm = new DefaultTableModel(
+				new Object[][] {
+				},
+				new String[] {
+					"ID", "Name", "adress"
+				}
+			) {
+				boolean[] columnEditables = new boolean[] {
+					false, false, false
+				};
+				public boolean isCellEditable(int row, int column) {
+					return columnEditables[column];
+				}
+			};
+		DefaultTableModel employeesDtm = new DefaultTableModel(new Object[][] {
+				},
+				new String[] {
+					"ID", "Name", "adress","Ocupation","Sex"
+				}) {
+				Class[] columnTypes = new Class[] {
+					Integer.class, String.class, String.class, String.class,
+					String.class
+				};
+				boolean[] columnEditables = new boolean[] {
+					false, false, false, false,false
+				};
+				public boolean isCellEditable(int row, int column) {
+					return columnEditables[column];
+				}
+			};
+		DefaultTableModel productsDtm = new DefaultTableModel(new Object[][] {
+		},
+		new String[] {
+			"ID", "Description", "Buyprice","Sellprice","Restock","Stocked","Provider"
+		}) {
+		Class[] columnTypes = new Class[] {
+			Integer.class, String.class, Double.class, Double.class,
+			Integer.class, Integer.class, String.class
+		};
+		boolean[] columnEditables = new boolean[] {
+			false, false, false, false, false, false,false
+		};
+		public boolean isCellEditable(int row, int column) {
+			return columnEditables[column];
+		}
+	};
 		Esclavo2 = new JTextField();
-		Esclavo2.setBounds(186, 68, 90, 39);
+		Esclavo2.setBounds(156, 50, 90, 39);
 		panel_1.add(Esclavo2);
 		Esclavo2.setColumns(10);
 		Esclavo2.addActionListener(new ActionListener() {
-
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if(Esclavo2.getText().equalsIgnoreCase("insert")) {
-				Esclavo2.setEnabled(false);
-					Esclavito1.setVisible(true);
+					if(Esclavo1.getSelectedItem().equals("Providers")) {
+						Esclavo2.setEnabled(false);
+						Esclavito1.setVisible(true);
 						Esclavito2.setVisible(true);
-							Esclavito3.setVisible(true);
-								InsertEsclavito.setVisible(true);
-				}	
-				else if(Esclavo2.getText().equalsIgnoreCase("delete")) 
-					Provider.papocochino((String) Esclavo1.getSelectedItem());
-				
-				else if(Esclavo2.getText().equalsIgnoreCase("read")) {
-					Provider.papoApestoso(Esclavo1, queryArea);
+						Esclavito3.setVisible(true);
+						InsertEsclavito.setVisible(true);
+					}
+					else if(Esclavo1.getSelectedItem().equals("Employees")) {
+						Esclavo2.setEnabled(false);
+						Manito1.setVisible(true);
+						Manito2.setVisible(true);
+						Manito3.setVisible(true);
+						InsertManito.setVisible(true);
+						Manito4.setVisible(true);
+						Manito5.setVisible(true);
+					}
+					else if(Esclavo1.getSelectedItem().equals("Products")) {
+						Esclavo2.setEnabled(false);
+						Perrito1.setVisible(true);
+						Perrito2.setVisible(true);
+						Perrito3.setVisible(true);
+						perrito4.setVisible(true);
+						perrito5.setVisible(true);
+						perrito7.setVisible(true);
+					}
 				}
+					
+
+				else if(Esclavo2.getText().equalsIgnoreCase("read")) {
+					if(Esclavo1.getSelectedItem().equals("Providers")) {
+						queryTable.setModel(ProvidersDtm);
+						Provider.papoApestoso(Esclavo1, ProvidersDtm);
+					}
+					else if(Esclavo1.getSelectedItem().equals("Employees")) {
+						queryTable.setModel(employeesDtm);
+						Employee.selectEmployee(Esclavo1, employeesDtm);
+					}
+					else if(Esclavo1.getSelectedItem().equals("Products")) {
+						queryTable.setModel(productsDtm);
+						Product.selectFromProduct(Esclavo1, productsDtm);
+					}
+				}
+				else
+					JOptionPane.showMessageDialog(Main.frame, "Valid inputs are:\n"
+							+ "INSERT, READ, UPDATE, DELETE.","Invalid input", JOptionPane.WARNING_MESSAGE);
 			}
 			
 		});
@@ -173,7 +224,7 @@ public class UserInterface extends JFrame {
 		Esclavito1 = new JTextField();
 		Esclavito1.setVisible(false);
 		Esclavito1.setToolTipText("Insert Code");
-		Esclavito1.setBounds(40, 118, 62, 39);
+		Esclavito1.setBounds(10, 98, 62, 39);
 		panel_1.add(Esclavito1);
 		Esclavito1.setColumns(10);
 		
@@ -181,14 +232,14 @@ public class UserInterface extends JFrame {
 		Esclavito2.setVisible(false);
 		Esclavito2.setToolTipText("Insert Name");
 		Esclavito2.setColumns(10);
-		Esclavito2.setBounds(112, 118, 62, 39);
+		Esclavito2.setBounds(82, 98, 62, 39);
 		panel_1.add(Esclavito2);
 		
 		Esclavito3 = new JTextField();
 		Esclavito3.setVisible(false);
 		Esclavito3.setToolTipText("Insert address");
 		Esclavito3.setColumns(10);
-		Esclavito3.setBounds(188, 118, 90, 39);
+		Esclavito3.setBounds(156, 98, 90, 39);
 		panel_1.add(Esclavito3);
 		
 		InsertEsclavito = new JButton("Insert");
@@ -207,71 +258,72 @@ public class UserInterface extends JFrame {
 				Esclavo2.setEnabled(true);
 			}
 		});
-		InsertEsclavito.setBounds(40, 168, 236, 23);
+		InsertEsclavito.setBounds(10, 148, 236, 23);
 		panel_1.add(InsertEsclavito);
 		
 		Manito1 = new JTextField();
 		Manito1.setVisible(false);
 		Manito1.setToolTipText("Ci");
 		Manito1.setColumns(10);
-		Manito1.setBounds(40, 289, 64, 39);
+		Manito1.setBounds(10, 98, 64, 39);
 		panel_1.add(Manito1);
 		
-		textArea = new JTextArea();
-		textArea.setEditable(false);
-		textArea.setText("Empleados:");
-		textArea.setFont(new Font("Monospaced", Font.PLAIN, 16));
-		textArea.setBackground(SystemColor.menu);
-		textArea.setBounds(40, 202, 136, 26);
-		panel_1.add(textArea);
-		
-		Mano1 = new JComboBox();
+		Mano1 = new JComboBox<Object>();
 		Mano1.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 15));
 		Mano1.setBackground(Color.WHITE);
-		Mano1.setBounds(40, 239, 136, 39);
-		Mano1.addItem("Employees");
+		Mano1.setBounds(502, 48, 136, 39);
+		Mano1.addItem("----");
 		panel_1.add(Mano1);
 		
 		Mano2 = new JTextField();
 		Mano2.setColumns(10);
-		Mano2.setBounds(186, 239, 90, 39);
+		Mano2.setBounds(644, 50, 90, 39);
 		Mano2.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if(Mano2.getText().equalsIgnoreCase("insert")) {
-					Mano2.setEnabled(false);
-						Manito1.setVisible(true);
-							Manito2.setVisible(true);
-								Manito3.setVisible(true);
-									InsertManito.setVisible(true);
-										Manito4.setVisible(true);
-											Manito5.setVisible(true);
-					}	
-					else if(Mano2.getText().equalsIgnoreCase("delete")) {
+					if(Mano2.getText().equalsIgnoreCase("delete")) {
+						if(Esclavo1.getSelectedItem().equals("Providers"))
+							Provider.papocochino((String)Mano1.getSelectedItem(),ProvidersDtm,
+									Mano1);
+						else if(Esclavo1.getSelectedItem().equals("Employees"))
+							Employee.deleteEmployee((int)Mano1.getSelectedItem());
 						
 					}
-					else if(Mano2.getText().equalsIgnoreCase("read"))
-						Employee.selectEmployee(Mano1, queryArea);
-			}
-		});
+					else if(Mano2.getText().equalsIgnoreCase("read")) {
+						if(Esclavo1.getSelectedItem().equals("Providers")) {
+							queryTable.setModel(ProvidersDtm);
+							Provider.papoApestoso(Mano1,ProvidersDtm);
+						}
+							
+						else if(Esclavo1.getSelectedItem().equals("Employees")) {
+							queryTable.setModel(employeesDtm);
+							Employee.selectEmployee(Mano1, employeesDtm);
+						}
+							
+						else if(Esclavo1.getSelectedItem().equals("Products")) {
+							queryTable.setModel(productsDtm);
+							Product.selectFromProduct(Mano1, productsDtm);
+						}
+					}
+			}});
 		panel_1.add(Mano2);
 		
 		Manito2 = new JTextField();
 		Manito2.setVisible(false);
 		Manito2.setToolTipText("Name");
 		Manito2.setColumns(10);
-		Manito2.setBounds(114, 289, 62, 39);
+		Manito2.setBounds(82, 98, 62, 39);
 		panel_1.add(Manito2);
 		
 		Manito3 = new JTextField();
 		Manito3.setVisible(false);
 		Manito3.setColumns(10);
-		Manito3.setBounds(186, 289, 90, 39);
+		Manito3.setBounds(156, 98, 90, 39);
 		panel_1.add(Manito3);
 		
 		InsertManito = new JButton("Insert");
 		InsertManito.setVisible(false);
-		InsertManito.setBounds(40, 339, 382, 23);
+		InsertManito.setBounds(10, 148, 382, 23);
 		InsertManito.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -298,63 +350,26 @@ public class UserInterface extends JFrame {
 		Perrito1.setVisible(false);
 		Perrito1.setToolTipText("ID");
 		Perrito1.setColumns(10);
-		Perrito1.setBounds(40, 460, 64, 39);
+		Perrito1.setBounds(10, 98, 64, 39);
 		panel_1.add(Perrito1);
-		
-		plox = new JTextArea();
-		plox.setEditable(false);
-		plox.setText("Productos:");
-		plox.setFont(new Font("Monospaced", Font.PLAIN, 16));
-		plox.setBackground(SystemColor.menu);
-		plox.setBounds(40, 373, 136, 26);
-		panel_1.add(plox);
-		
-		Perro1 = new JComboBox();
-		Perro1.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 15));
-		Perro1.setBackground(Color.WHITE);
-		Perro1.setBounds(40, 410, 136, 39);
-		Perro1.addItem("ProdID");
-		panel_1.add(Perro1);
-		
-		Perro2 = new JTextField();
-		Perro2.setColumns(10);
-		Perro2.setBounds(186, 410, 90, 39);
-		Perro2.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				if(Perro2.getText().equalsIgnoreCase("insert")) {
-					Perro2.setEnabled(false);
-						Perrito1.setVisible(true);
-						Perrito2.setVisible(true);
-						Perrito3.setVisible(true);
-						perrito4.setVisible(true);
-						perrito5.setVisible(true);
-						perrito6.setVisible(true);
-						perrito7.setVisible(true);
-				}
-				else if(Perro2.getText().equalsIgnoreCase("Delete"));
-				
-			}
-		});
-		panel_1.add(Perro2);
 		
 		Perrito2 = new JTextField();
 		Perrito2.setVisible(false);
 		Perrito2.setToolTipText("Description");
 		Perrito2.setColumns(10);
-		Perrito2.setBounds(114, 460, 62, 39);
+		Perrito2.setBounds(82, 98, 62, 39);
 		panel_1.add(Perrito2);
 		
 		Perrito3 = new JTextField();
 		Perrito3.setVisible(false);
 		Perrito3.setToolTipText("buyprice");
 		Perrito3.setColumns(10);
-		Perrito3.setBounds(186, 460, 46, 39);
+		Perrito3.setBounds(156, 100, 46, 39);
 		panel_1.add(Perrito3);
 		
 		InsertPerrito = new JButton("Insert");
 		InsertPerrito.setVisible(false);
-		InsertPerrito.setBounds(40, 510, 382, 23);
+		InsertPerrito.setBounds(10, 148, 382, 23);
 		panel_1.add(InsertPerrito);
 		
 		txtrConsultas = new JTextArea();
@@ -362,134 +377,116 @@ public class UserInterface extends JFrame {
 		txtrConsultas.setText("                        Consultas");
 		txtrConsultas.setFont(new Font("Stencil", Font.PLAIN, 22));
 		txtrConsultas.setBackground(SystemColor.menu);
-		txtrConsultas.setBounds(420, 68, 342, 32);
+		txtrConsultas.setBounds(202, 205, 342, 23);
 		panel_1.add(txtrConsultas);
 		
-		Manito4 = new JComboBox();
+		Manito4 = new JComboBox<Object>();
 		Manito4.setBackground(Color.WHITE);
 		Manito4.setVisible(false);
-		Manito4.setBounds(286, 241, 46, 39);
+		Manito4.setBounds(256, 98, 46, 39);
 		Manito4.addItem("SEX");
 		Manito4.addItem("M");
 		Manito4.addItem("F");
 		Manito4.addItem("U");
 		panel_1.add(Manito4);
 		
-		Manito5 = new JComboBox();
+		Manito5 = new JComboBox<Object>();
 		Manito5.setBackground(Color.WHITE);
 		Manito5.setVisible(false);
-		Manito5.setBounds(286, 289, 136, 39);
+		Manito5.setBounds(312, 98, 136, 39);
+		fillOcupationsBox(Manito5);
 		panel_1.add(Manito5);
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		
-		
-		queryArea = new JTextArea();
-		queryArea.setEditable(false);
-		queryArea.setBounds(449, 102, 364, 431);
-		panel_1.add(queryArea);
 		
 		perrito4 = new JTextField();
 		perrito4.setVisible(false);
 		perrito4.setToolTipText("sellprice");
 		perrito4.setColumns(10);
-		perrito4.setBounds(242, 460, 46, 39);
+		perrito4.setBounds(212, 100, 46, 39);
 		panel_1.add(perrito4);
 		
 		perrito5 = new JTextField();
 		perrito5.setVisible(false);
 		perrito5.setToolTipText("restock");
 		perrito5.setColumns(10);
-		perrito5.setBounds(298, 460, 46, 39);
+		perrito5.setBounds(268, 98, 46, 39);
 		panel_1.add(perrito5);
 		
-		perrito6 = new JTextField();
-		perrito6.setVisible(false);
-		perrito6.setToolTipText("stock");
-		perrito6.setColumns(10);
-		perrito6.setBounds(354, 460, 68, 39);
-		panel_1.add(perrito6);
-		
-		perrito7 = new JComboBox();
+		perrito7 = new JComboBox<String>();
 		perrito7.setVisible(false);
 		perrito7.setFont(new Font("Dialog", Font.PLAIN, 15));
 		perrito7.setBackground(Color.WHITE);
-		perrito7.setBounds(286, 410, 136, 39);
+		perrito7.setBounds(324, 98, 136, 39);
 		perrito7.addItem("Provider");
 		panel_1.add(perrito7);
-		addProviderstoGui(Esclavo1,Mano1,Manito5,Perro1,perrito7);
 		
+		panel_3 = new JPanel();
+		panel_3.setBounds(10, 239, 827, 325);
+		panel_1.add(panel_3);
+		panel_3.setLayout(new BorderLayout(0, 0));
 		
+		scrollPane = new JScrollPane();
+		panel_3.add(scrollPane);
 		
-		
+		queryTable = new JTable();
+		queryTable.setFillsViewportHeight(true);
+		queryTable.getTableHeader().setBackground(Color.gray);
+		scrollPane.setViewportView(queryTable);
 	}
-	private void addProviderstoGui(JComboBox Box, JComboBox Box1, JComboBox Box2, JComboBox Box3, JComboBox Box4) {
+
+	private void fillBoxes(String toFillWith,JComboBox<Object> Box,String tablename) {
 		if(ConnManager.getConnection()!=null) {
 			Statement stm = null;
-			String query = "select Pname from provider;";
+			String query = "Select "+toFillWith+" from "+tablename;
 			try {
 				stm = ConnManager.getConnection().createStatement();
 				ResultSet rs = stm.executeQuery(query);
+				Box.removeAllItems();
+				Box.addItem("----");
 				while(rs.next()) {
-					String pname = rs.getString("Pname");
-					Box.addItem(pname);
-					Box4.addItem(pname);
+					Object toFill = rs.getString(toFillWith);
+					Box.addItem(toFill);
 				}
-					
-				query = "Select idemployee from employee;";
-				rs = stm.executeQuery(query);
-				while(rs.next()) 
-					Box1.addItem(rs.getInt("idemployee"));
-				
-				query = "select oname from ocupation;";
-				rs = stm.executeQuery(query);
-				while(rs.next())
-					Box2.addItem(rs.getString("oname"));
-				
-				query = "select idproduct from product;";
-				rs = stm.executeQuery(query);
-				while(rs.next())
-					Box3.addItem(rs.getInt("idproduct"));
-			
-				
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}finally {
 				if(stm!=null) {
 					try {
 						stm.close();
 					} catch (SQLException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
 			}
 			
 		}
-}
+	}
+	
+	private void fillOcupationsBox(JComboBox<Object> Box) {
+		Statement stm = null;
+		String query = "Select oname from ocupation";
+		if(ConnManager.getConnection()!=null) {
+			try {
+				stm = ConnManager.getConnection().createStatement();
+				ResultSet rs = stm.executeQuery(query);
+				Box.addItem("Ocupation");
+				while(rs.next())
+					Box.addItem(rs.getString("oname"));
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}finally {
+				if(stm!=null) {
+					try {
+						stm.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	}
 	private void innitBillingTab(JPanel panel) {
-		DefaultTableModel dtm = new DefaultTableModel(
-				new Object[][] {null,null,null,null
-				},
-				new String[] {
-					"  Product", "  Price", " Quantity", " Total"
-				}
-			) {
-				Class[] columnTypes = new Class[] {
-					String.class, Double.class, Integer.class, Double.class
-				};
-				public Class getColumnClass(int columnIndex) {
-					return columnTypes[columnIndex];
-				}
-				boolean[] columnEditables = new boolean[] {
-					false, false, false, false
-				};
-				public boolean isCellEditable(int row, int column) {
-					return columnEditables[column];
-				}
-			};
-		Main.productsArea = dtm;
 		
 		comboBox = new JComboBox<String>();
 		comboBox.setBounds(35, 30, 45, 22);
@@ -596,6 +593,49 @@ public class UserInterface extends JFrame {
 		totalPane.setBackground(SystemColor.menu);
 		totalPane.setBounds(489, 52, 336, 94);
 		Main.totalPane = totalPane;
+		
+		JPanel panel_2 = new JPanel();
+		panel_2.setBackground(Color.WHITE);
+		panel_2.setOpaque(false);
+		panel_2.setBounds(35, 160, 790, 337);
+		panel.add(panel_2);
+		DefaultTableModel dtm = new DefaultTableModel(
+				new Object[][] {
+				},
+				new String[] {
+					" Product", " Price", "  Quantity", "  Total"
+				}
+			) {
+				Class[] columnTypes = new Class[] {
+					String.class, Double.class, Integer.class, Double.class
+				};
+				public Class<?> getColumnClass(int columnIndex) {
+					return columnTypes[columnIndex];
+				}
+			};
+		Main.productsArea = dtm;
+		panel_2.setLayout(new BorderLayout(0, 0));
+		
+		scrollPane_1 = new JScrollPane();
+		scrollPane_1.setOpaque(false);
+		scrollPane_1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane_1.setBackground(Color.WHITE);
+		panel_2.add(scrollPane_1);
+		
+		table = new JTable();
+		table.setShowGrid(false);
+		table.setFillsViewportHeight(true);
+		table.setBackground(Color.LIGHT_GRAY);
+		scrollPane_1.setViewportView(table);
+		table.setModel(dtm);
+		table.getColumnModel().getColumn(0).setResizable(false);
+		table.getColumnModel().getColumn(0).setPreferredWidth(334);
+		table.getColumnModel().getColumn(1).setResizable(false);
+		table.getColumnModel().getColumn(1).setPreferredWidth(176);
+		table.getColumnModel().getColumn(2).setPreferredWidth(203);
+		table.getColumnModel().getColumn(3).setResizable(false);
+		table.getColumnModel().getColumn(3).setPreferredWidth(176);
+		table.getTableHeader().setBackground(Color.CYAN);
 		panel.add(totalPane);
 	}
 	
@@ -641,6 +681,18 @@ public class UserInterface extends JFrame {
 			}
 		});
 	}
+
+	@Override
+	public void run() {
+		innitGui();
+		addActions();
+		frame.setVisible(true);
+	}
+	
+	public void start() {
+		swing = new Thread(this);
+		swing.start();
+	}
 }
 
 class ButtonAction implements ActionListener{
@@ -657,10 +709,9 @@ class ButtonAction implements ActionListener{
 					Main.clientName.setEditable(true);
 					Main.clientAdr.setText(null);
 					Main.clientAdr.setEditable(true);
-					for(int i = Main.productsArea.getRowCount()-1; i>0; i--) {
-						Main.productsArea.removeRow(i);
-					}
-						
+					for(int i = Main.productsArea.getRowCount(); i>0; i--) {
+						Main.productsArea.removeRow(i-1);
+					}		
 				}		
 			}
 			else
@@ -687,8 +738,8 @@ class ButtonAction implements ActionListener{
 			Main.clientAdr.setEditable(true);
 			Main.employeeID.setText(null);
 			Main.employeeID.setEditable(true);
-			for(int i = Main.productsArea.getRowCount()-1; i>0; i--) {
-				Main.productsArea.removeRow(i);
+			for(int i = Main.productsArea.getRowCount(); i>0; i--) {
+				Main.productsArea.removeRow(i-1);
 			}
 				
 		}
@@ -706,8 +757,8 @@ class ButtonAction implements ActionListener{
 			Main.clientName.setEditable(true);
 			Main.clientAdr.setText(null);
 			Main.clientAdr.setEditable(true);
-			for(int i = Main.productsArea.getRowCount()-1; i>0; i--)
-				Main.productsArea.removeRow(i);
+			for(int i = Main.productsArea.getRowCount(); i>0; i--)
+				Main.productsArea.removeRow(i-1);
 		}
 		else if(e.getActionCommand().equals("CANCEL")) {
 			if(Bill.client!=null && Bill.client.getBill()!=null && Bill.client.getBill().productsToBuy.size()>0) {

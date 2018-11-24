@@ -9,6 +9,7 @@ import java.util.HashMap;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
+import javax.swing.table.DefaultTableModel;
 
 public class Employee {
 	private static Connection connection = ConnManager.getConnection();
@@ -73,7 +74,6 @@ public class Employee {
 				stm.execute(query);
 				JOptionPane.showMessageDialog(Main.frame,"New employee added.","Success!",JOptionPane.INFORMATION_MESSAGE);
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}finally {
 				if(stm!=null) {
@@ -86,32 +86,23 @@ public class Employee {
 			}
 		}
 	}
-	public static void selectEmployee(JComboBox Box, JTextArea Area) {
+	public static void selectEmployee(JComboBox Box, DefaultTableModel employeesDtm) {
 		Statement stm = null;
 		String query = null;
 		if(connection != null) {
 			try {
 				stm = connection.createStatement();
-				if(Box.getSelectedIndex()==0)
+				if(Box.getSelectedIndex()==0 || Box.getSelectedItem().equals("Employees"))
 					query = "Select * from employee";
 				else
 					query = "Select * from employee where idemployee = "+Box.getSelectedItem()+";";
 				ResultSet rs = stm.executeQuery(query);
-				Area.setText("EMPLOYEE ID\tEMPLOYEE NAME\tEMPLOYEE ADRESS\tEMPLOYEEO\tEMPLOYEESEX\n");
-				Statement st1 = null;
-				st1 = connection.createStatement();
+				employeesDtm.setRowCount(0);
 				while(rs.next()) {
-					String oname = null;
-					int eid = rs.getInt("idemployee");String ename = rs.getString("ename");String adress = rs.getString("eadress");
-					String sex = rs.getString("sex");int ocupation = rs.getInt("idocupation");
-					query = "Select oname from ocupation where idocupation = "+ocupation+";";
-					ResultSet rs1 = st1.executeQuery(query);
-					if(rs1.next())
-						 oname = rs1.getString("oname");
-					String toShow = String.format("%d\t%s\t%s\t%s\t%s\n", eid,ename,adress,oname,sex);
-					Area.append(toShow);
+					Object[] newRow = {rs.getInt(1),rs.getString(2),rs.getString(3),Ocupation.ocupations.get(rs.getInt(4)).getOname(),
+							rs.getString(5)};
+					employeesDtm.addRow(newRow);
 				}
-				st1.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}finally {
@@ -122,8 +113,11 @@ public class Employee {
 						e.printStackTrace();
 					}
 				}
-			}
+			}	
 		}
+	}
+	public static void deleteEmployee(int idemployee) {
+		
 	}
 	
 	public int getIdemployee() {

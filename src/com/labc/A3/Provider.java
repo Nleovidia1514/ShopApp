@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.table.DefaultTableModel;
 
 public class Provider {
 	private static Connection connection = ConnManager.getConnection();
@@ -52,22 +53,32 @@ public class Provider {
 			}
 		}
 	}
-	public static void papocochino(String Pname) {
+	public static void papocochino(String Pname,DefaultTableModel providersDtm,JComboBox box) {
+		Statement stm = null;
+		String query = "select idprovider from provider where Pname ='"+ Pname+"'";
 		if(ConnManager.getConnection()!=null) {
-			Statement stm = null;
-			String query = "delete from provider where Pname ='"+ Pname+"'";
 			try {
 				stm = ConnManager.getConnection().createStatement();
+				ResultSet rs = stm.executeQuery(query);
+				if(rs.next())
+					Provider.providers.remove(rs.getInt(1));
+				
+				for(int i= providersDtm.getRowCount();i>0;i--) {		
+					if(providersDtm.getValueAt(i-1, 1).equals(Pname))
+						providersDtm.removeRow(i-1);
+				}
+				query = "delete from provider where pname = '"+Pname+"';";
 				stm.execute(query);
+				box.removeItem(Pname);
+				JOptionPane.showMessageDialog(Main.frame,"Provider removed succesfully","Removed",
+						JOptionPane.INFORMATION_MESSAGE);
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}finally {
 				if(stm!=null) {
 					try {
 						stm.close();
 					} catch (SQLException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -83,37 +94,36 @@ public class Provider {
 				stm.execute(query);
 				JOptionPane.showMessageDialog(Main.frame, "Tu papo esta listo", "Congrats Osc", JOptionPane.INFORMATION_MESSAGE);
 			} catch (SQLException e) {
-				e.printStackTrace();
+				JOptionPane.showMessageDialog(Main.frame, e, "ERROR", JOptionPane.ERROR_MESSAGE);
 			}finally {
 				if(stm!=null) {
 					try {
 						stm.close();
 					} catch (SQLException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
 			}
 		}
 	}
-	public static void papoApestoso(JComboBox Box, JTextArea Area) {
+	public static void papoApestoso(JComboBox Box,DefaultTableModel providersDtm) {
 		Statement stm = null;
 		String query = null;
 		if(connection != null) {
 			try {
 				stm = connection.createStatement();
-				if(Box.getSelectedIndex()==0)
+				if(Box.getSelectedIndex()==0 || Box.getSelectedItem().equals("Providers"))
 					query = "Select * from provider";
 				else
 					query = "Select * from provider where pname = '"+(String)Box.getSelectedItem()+"';";
 				ResultSet rs = stm.executeQuery(query);
-				Area.setText("PROVIDER ID\tPROVIDER NAME\tPROVIDER ADRESS\n");
+				providersDtm.setRowCount(0);
 				while(rs.next()) {
-					String toShow = rs.getInt(1)+"\t"+rs.getString(2)+"\t"+rs.getString(3)+"\n";
-					Area.append(toShow);
+					Object[] newRow = {rs.getInt(1),rs.getString(2),rs.getString(3)};
+					providersDtm.addRow(newRow);
 				}
 			} catch (SQLException e) {
-				e.printStackTrace();
+				JOptionPane.showMessageDialog(Main.frame, e, "ERROR", JOptionPane.ERROR_MESSAGE);
 			}finally {
 				if(stm!=null) {
 					try {

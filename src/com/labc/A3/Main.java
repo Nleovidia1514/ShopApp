@@ -29,18 +29,9 @@ public class Main {
 	public static JPanel adminpanel;
 	
 	public static void main(String[] args) {
-		ConnManager.getConnection();
-		innitStuff();
-		frame = new UserInterface();
-		frame.setVisible(true);
+		UserInterface swing = new UserInterface();
+		swing.start();
+		Store store = new Store();
+		store.start();
 	}
-	
-	private static void innitStuff(){
-		Provider.innitProviders();
-		Client.innitClients();
-		Product.innitProducts();
-		Ocupation.innitOcupations();
-		Employee.innitEmployees();
-	}
-
 }
