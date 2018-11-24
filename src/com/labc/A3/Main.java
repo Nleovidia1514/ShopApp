@@ -30,7 +30,6 @@ public class Main {
 	
 	public static void main(String[] args) {
 		UserInterface swing = new UserInterface();
-		swing.start();
 		Store store = new Store();
 		store.start();
 	}

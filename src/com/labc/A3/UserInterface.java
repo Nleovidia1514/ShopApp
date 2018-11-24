@@ -7,8 +7,6 @@ import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.DecimalFormat;
-
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -24,13 +22,18 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
-import java.awt.ComponentOrientation;
-import java.awt.Dimension;
-import java.awt.Component;
 import java.awt.BorderLayout;
 
 public class UserInterface extends JFrame implements Runnable {
 	public UserInterface() {
+		innitGui();
+		addActions();
+		frame.setVisible(true);
+	}
+
+	private void start() {
+		Thread swing = new Thread(this);
+		swing.start();
 	}
 
 	public JFrame frame = this;
@@ -65,7 +68,6 @@ public class UserInterface extends JFrame implements Runnable {
 	 * @return 
 	 */
 	
-	@SuppressWarnings("serial")
 	public void innitGui() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 858, 631);
@@ -305,6 +307,15 @@ public class UserInterface extends JFrame implements Runnable {
 							Product.selectFromProduct(Mano1, productsDtm);
 						}
 					}
+					else if(Mano2.getText().equalsIgnoreCase("Update")) {
+						if(Esclavo1.getSelectedItem().equals("Providers")) {
+							Provider.papoPeluo((String)Mano1.getSelectedItem(),ProvidersDtm);
+						}
+					}
+					else
+						JOptionPane.showMessageDialog(Main.frame, "Valid inputs are:\n"
+								+ "READ, UPDATE, DELETE.", "Invalid input", JOptionPane.WARNING_MESSAGE);
+					Mano2.setText(null);
 			}});
 		panel_1.add(Mano2);
 		
@@ -684,15 +695,9 @@ public class UserInterface extends JFrame implements Runnable {
 
 	@Override
 	public void run() {
-		innitGui();
-		addActions();
-		frame.setVisible(true);
+		
 	}
-	
-	public void start() {
-		swing = new Thread(this);
-		swing.start();
-	}
+
 }
 
 class ButtonAction implements ActionListener{
@@ -709,9 +714,7 @@ class ButtonAction implements ActionListener{
 					Main.clientName.setEditable(true);
 					Main.clientAdr.setText(null);
 					Main.clientAdr.setEditable(true);
-					for(int i = Main.productsArea.getRowCount(); i>0; i--) {
-						Main.productsArea.removeRow(i-1);
-					}		
+					Main.productsArea.setRowCount(0);
 				}		
 			}
 			else
@@ -723,7 +726,7 @@ class ButtonAction implements ActionListener{
 		}
 		
 		else if(e.getActionCommand().equals("RESET")) {
-			if(Bill.client!=null && Bill.client.getBill()!=null) 
+			if(Bill.client!=null && Bill.client.getBill()!=null) {
 				for(int i = 0; i<Bill.client.getBill().productsToBuy.size(); i++) {
 					Bill.client.getBill().productsToBuy.get(i).getProduct().setStocked(
 							Bill.client.getBill().productsToBuy.get(i).getProduct().getStocked()+
@@ -738,13 +741,12 @@ class ButtonAction implements ActionListener{
 			Main.clientAdr.setEditable(true);
 			Main.employeeID.setText(null);
 			Main.employeeID.setEditable(true);
-			for(int i = Main.productsArea.getRowCount(); i>0; i--) {
-				Main.productsArea.removeRow(i-1);
+			Main.totalPane.setText("TOTAL:\n\t0.0");
+			Main.productsArea.setRowCount(0);
 			}
-				
 		}
 		else if(e.getActionCommand().equals("CLEAR")) {
-			if(Bill.client.getBill()!=null && Bill.client.getBill()!=null) 
+			if(Bill.client!=null && Bill.client.getBill()!=null) 
 				for(int i = 0; i<Bill.client.getBill().productsToBuy.size(); i++) {
 					Bill.client.getBill().productsToBuy.get(i).getProduct().setStocked(
 							Bill.client.getBill().productsToBuy.get(i).getProduct().getStocked()+
@@ -757,8 +759,8 @@ class ButtonAction implements ActionListener{
 			Main.clientName.setEditable(true);
 			Main.clientAdr.setText(null);
 			Main.clientAdr.setEditable(true);
-			for(int i = Main.productsArea.getRowCount(); i>0; i--)
-				Main.productsArea.removeRow(i-1);
+			Main.totalPane.setText("TOTAL:\n\t0.0");
+			Main.productsArea.setRowCount(0);
 		}
 		else if(e.getActionCommand().equals("CANCEL")) {
 			if(Bill.client!=null && Bill.client.getBill()!=null && Bill.client.getBill().productsToBuy.size()>0) {

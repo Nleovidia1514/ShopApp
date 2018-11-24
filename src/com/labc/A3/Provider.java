@@ -1,5 +1,6 @@
 package com.labc.A3;
 
+import java.awt.Color;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -133,6 +134,49 @@ public class Provider {
 					}
 				}
 			}	
+		}
+	}
+	public static void papoPeluo(String text, DefaultTableModel providersDtm) {
+		Statement stm = null;
+		JComboBox box = new JComboBox();
+		box.addItem("idProvider");
+		box.addItem("pName");
+		box.addItem("pAdress");
+		box.setBackground(Color.WHITE);
+		String toUpdate = JOptionPane.showInputDialog(Main.frame, box, "Which field do you wish"
+				+ " to update?", JOptionPane.QUESTION_MESSAGE);
+		String query = "update provider set "+box.getSelectedItem()+" = ";
+		if(box.getSelectedItem().equals("pName") || box.getSelectedItem().equals("pAdress"))
+			query = query +"'"+ toUpdate+"' where pname ='"+text+"';";
+		else
+			query = query + toUpdate+" where pname ='"+text+"';";
+		if(connection != null && toUpdate!=null) {
+			try {
+				for(int i= providersDtm.getRowCount();i>0;i--) 	{
+					if(providersDtm.getValueAt(i-1, 1).equals(text)) 
+						providersDtm.setValueAt(toUpdate, i-1, box.getSelectedIndex());
+					}
+				stm = connection.createStatement();
+				stm.execute(query);
+				ResultSet rs = stm.executeQuery("Select * from provider where "+
+				box.getSelectedItem()+" = '"+toUpdate+"';");
+				while(rs.next()) {
+					Provider.providers.remove(rs.getInt(1));
+					new Provider(rs.getInt(1),rs.getString(2),rs.getString(3));
+				}
+				JOptionPane.showMessageDialog(Main.frame, "Updated succesfully", "Updated",
+						JOptionPane.INFORMATION_MESSAGE);
+			}catch(SQLException e) {
+				e.printStackTrace();
+			}finally {
+				if (stm!=null) {
+					try {
+						stm.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}
 		}
 	}
 	public int getIdprovider() {

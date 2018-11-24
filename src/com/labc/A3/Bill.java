@@ -38,7 +38,6 @@ public class Bill {
 					query = "Select idbill from bill where idbill = "+this.billNmbr;
 					rs = stm.executeQuery(query);
 				}
-					
 				this.productsInBill = new HashMap<Integer,Bill_Product>();
 				this.owner = client;
 				this.employee = employee;
