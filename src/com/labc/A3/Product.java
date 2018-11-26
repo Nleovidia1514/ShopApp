@@ -7,6 +7,7 @@ import java.sql.Statement;
 import java.util.HashMap;
 
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.table.DefaultTableModel;
 
@@ -99,41 +100,71 @@ public class Product{
 			}	
 		}
 	}
-	/*if(connection!=null) {
-			if(checkIfProductExists(productID)) {
-				try {
-					stm = connection.createStatement();
-					ResultSet rs = stm.executeQuery(query);
-					if(!rs.next()) {
-						query = String.format("Insert into Detail values(%d,%d,1,(Select SellPrice from Product where IdProduct = %d"
-								+ "),(Select SellPrice from Product where IdProduct = %d)) ",bill.billNmbr,productID,productID,productID);
-						stm.execute(query);
-					}
-					else {
-						query = String.format("Update Detail set Quantity = Quantity + 1, total = (Quantity+1)*sellprice where IdProduct = %d "
-								+ "and IdBill = %d",productID,bill.billNmbr);
-						stm.execute(query);
-					}
-					query = String.format("Select * from Detail,Product where IdBill = %d and Detail.idProduct = %d "
-							+ "and Product.idProduct = %d",bill.billNmbr, productID,productID);
-					rs = stm.executeQuery(query);
-					while(rs.next()) {
-						String productDesc = rs.getString("DescriptionP");
-						int productPrice = rs.getInt("SellPrice");
-						int productQuantity = rs.getInt("Quantity");
-						int totalPrice = rs.getInt("Total");
-						Main.productsArea.append(String.format("\n%1$-30s %2$-30s %3$-30s %4$-30s",productDesc,productPrice,productQuantity,totalPrice));
-					}
-				} catch (SQLException e) {
-					e.printStackTrace();;
-				}finally {
-					if(stm!=null) {
-						try {stm.close();}catch(Exception e) {e.printStackTrace();}
+	public static void insertProduct(int idproduct, String pdescription, double buyprice, double sellprice, int restock
+			, int stocked, String pname, DefaultTableModel productsDtm) {
+		int idprovider = 0;
+		Statement stm = null;
+		String query = String.format("select idprovider from provider where pname = '%s'",pname);
+		if(connection!=null) {
+			try {
+				stm = connection.createStatement();
+				ResultSet rs = stm.executeQuery(query);
+				while(rs.next())
+					 idprovider = rs.getInt(1);
+				new Product(idproduct, pdescription, buyprice, sellprice, restock, stocked, Provider.providers.get(idprovider));
+				query = String.format("insert into product values(%d,'%s',"+buyprice+","+sellprice+",%d,%d,%d)",idproduct,
+						pdescription, restock, stocked, idprovider);
+				stm.execute(query);
+				Object[] newRow = {idproduct, pdescription, buyprice, sellprice, restock, stocked, pname};
+				productsDtm.addRow(newRow);
+				JOptionPane.showMessageDialog(Main.frame, "Product added succesfully", "Added", JOptionPane.INFORMATION_MESSAGE);
+			}catch(SQLException e) {
+				e.printStackTrace();
+			}finally {
+				if(stm!=null) {
+					try {
+						stm.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
 					}
 				}
 			}
-		}*/
-
+		}
+	}
+	public static void deleteFromProduct(JComboBox Box, DefaultTableModel productsDtm) {
+		Statement stm = null;
+		int toDelete = Integer.valueOf((String) Box.getSelectedItem());
+		String query = "select idproduct from product where idproduct ="+toDelete+";";
+		if(ConnManager.getConnection()!=null) {
+			try {
+				stm = ConnManager.getConnection().createStatement();
+				ResultSet rs = stm.executeQuery(query);
+				if(rs.next())
+					Product.products.remove(rs.getInt(1));
+				
+				for(int i= productsDtm.getRowCount();i>0;i--) 	
+					if(productsDtm.getValueAt(i-1, 0).equals(toDelete)) 
+						productsDtm.removeRow(i-1);
+					
+				query = "delete from product where idproduct = "+toDelete+";";
+				stm.execute(query);
+				Box.removeItem(Box.getSelectedItem());
+				JOptionPane.showMessageDialog(Main.frame,"Product removed succesfully","Removed",
+						JOptionPane.INFORMATION_MESSAGE);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}finally {
+				if(stm!=null) {
+					try {
+						stm.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}	
+	}
+	
 	public int getIdproduct() {
 		return idproduct;
 	}

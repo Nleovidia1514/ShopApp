@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 public class Bill {
 	public static Client client;
@@ -132,30 +134,34 @@ public class Bill {
 		return false;
 	}
 	
-	/*Statement stm = null;
-		this.billNmbr = rnd.nextInt(200);
-		try {
-			String query = String.format("Insert into Bill Values (%d,'%s','%s%s',%d,0,0)",
-					billNmbr,sdf.format(System.currentTimeMillis()),idType.getSelectedItem(),cedulaID.getText(),Long.valueOf(employeeID.getText()));
-			stm = connection.createStatement();
-			stm.execute(query);
-			System.out.println("Bill created successfully!");
-		}catch(Exception e) {
-			JOptionPane.showMessageDialog(Main.frame, e, "Error", JOptionPane.ERROR_MESSAGE);
-		}finally {
-	        if (stm != null) { 
-	        	try {stm.close();}catch (SQLException e) {e.printStackTrace();} 
-	        }
+	public static void selectFromBills(JComboBox Box, DefaultTableModel billsDtm) {
+		Statement stm = null;
+		String query = null;
+		if(connection != null) {
+			try {
+				stm = connection.createStatement();
+				if(Box.getSelectedIndex()==0 || Box.getSelectedItem().equals("Bills"))
+					query = "Select * from bill";
+				else
+					query = "Select * from bill where idbill = '"+(String)Box.getSelectedItem()+"';";
+				ResultSet rs = stm.executeQuery(query);
+				billsDtm.setRowCount(0);
+				while(rs.next()) {
+					Object[] newRow = {rs.getInt(1),rs.getString(2),rs.getString(3),rs.getInt(4),
+							rs.getDouble(5), rs.getDouble(6)};
+					billsDtm.addRow(newRow);
+				}
+			} catch (SQLException e) {
+				JOptionPane.showMessageDialog(Main.frame, e, "ERROR", JOptionPane.ERROR_MESSAGE);
+			}finally {
+				if(stm!=null) {
+					try {
+						stm.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}	
 		}
-	/*public static void generateBill() {
-		Statement stm;
-		String query = "INSERT INTO Detalle VALUES()"
 	}
-	
-	public static void addProducts(long productID) {
-		Statement stm;
-		String query = ""
-	}*/
-	
-	
 }

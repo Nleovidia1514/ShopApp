@@ -43,7 +43,6 @@ public class UserInterface extends JFrame implements Runnable {
 	private JComboBox<String> comboBox;
 	private JTextArea adressTF, textArea_2, textArea_3, idProductTA, employeeIDTA, nameTA;
 	private JButton billButton, resetButton, clearButton, addCustButton;
-	public static String format = String.format("%1$-30s %2$-30s %3$-30s %4$-30s","Product","Price","Quantity","Total");
 	private JTextField Esclavo2,Esclavito1,Esclavito2,Esclavito3;
 	private JButton InsertEsclavito;
 	private JComboBox<Object> Mano1,Manito4,Manito5;
@@ -60,6 +59,7 @@ public class UserInterface extends JFrame implements Runnable {
 	private JTable queryTable;
 	private JScrollPane scrollPane_1;
 	private Thread swing;
+	private JTextField perrito6;
 	/**
 	 * Launch the application.
 
@@ -81,7 +81,6 @@ public class UserInterface extends JFrame implements Runnable {
 		contentPane.add(tabbedPane);
 		
 		JPanel panel = new JPanel();
-		ButtonAction.format = UserInterface.format;
 		panel.setLayout(null);
 		panel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		tabbedPane.addTab("BILLING", null, panel, null);
@@ -102,6 +101,8 @@ public class UserInterface extends JFrame implements Runnable {
 		Esclavo1.addItem("Providers");
 		Esclavo1.addItem("Employees");
 		Esclavo1.addItem("Products");
+		Esclavo1.addItem("Clients");
+		Esclavo1.addItem("Bills");
 		Esclavo1.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -111,6 +112,10 @@ public class UserInterface extends JFrame implements Runnable {
 					fillBoxes("idemployee",Mano1,"employee");
 				else if(Esclavo1.getSelectedItem().equals("Products"))
 					fillBoxes("idproduct",Mano1,"product");
+				else if(Esclavo1.getSelectedItem().equals("Clients"))
+					fillBoxes("idclient",Mano1,"client");
+				else if(Esclavo1.getSelectedItem().equals("Bills"))
+					fillBoxes("idbill",Mano1,"Bill");
 				else if(Esclavo1.getSelectedItem().equals("----")) {
 					Mano1.removeAllItems();
 					Mano1.addItem("----");
@@ -118,7 +123,6 @@ public class UserInterface extends JFrame implements Runnable {
 					
 			}
 		});
-		
 		DefaultTableModel ProvidersDtm = new DefaultTableModel(
 				new Object[][] {
 				},
@@ -138,10 +142,6 @@ public class UserInterface extends JFrame implements Runnable {
 				new String[] {
 					"ID", "Name", "adress","Ocupation","Sex"
 				}) {
-				Class[] columnTypes = new Class[] {
-					Integer.class, String.class, String.class, String.class,
-					String.class
-				};
 				boolean[] columnEditables = new boolean[] {
 					false, false, false, false,false
 				};
@@ -150,21 +150,44 @@ public class UserInterface extends JFrame implements Runnable {
 				}
 			};
 		DefaultTableModel productsDtm = new DefaultTableModel(new Object[][] {
-		},
-		new String[] {
-			"ID", "Description", "Buyprice","Sellprice","Restock","Stocked","Provider"
-		}) {
-		Class[] columnTypes = new Class[] {
-			Integer.class, String.class, Double.class, Double.class,
-			Integer.class, Integer.class, String.class
-		};
-		boolean[] columnEditables = new boolean[] {
-			false, false, false, false, false, false,false
-		};
-		public boolean isCellEditable(int row, int column) {
-			return columnEditables[column];
-		}
-	};
+				},
+				new String[] {
+					"ID", "Description", "Buyprice","Sellprice","Restock","Stocked","Provider"
+				}) {
+	
+				boolean[] columnEditables = new boolean[] {
+					false, false, false, false, false, false,false
+				};
+				public boolean isCellEditable(int row, int column) {
+					return columnEditables[column];
+				}
+			};
+		DefaultTableModel clientsDtm = new DefaultTableModel(new Object[][] {
+				},
+				new String[] {
+					"ID", "Name", "Adress","Money"
+				}) {
+				
+				boolean[] columnEditables = new boolean[] {
+					false, false, false, false
+				};
+				public boolean isCellEditable(int row, int column) {
+					return columnEditables[column];
+				}
+			};
+		DefaultTableModel billsDtm = new DefaultTableModel(new Object[][] {
+				},
+				new String[] {
+					"ID", "Date", "Client","Cashier","Subtotal","Total"
+				}) {
+				
+				boolean[] columnEditables = new boolean[] {
+					false, false, false, false, false, false
+				};
+				public boolean isCellEditable(int row, int column) {
+					return columnEditables[column];
+				}
+			};
 		Esclavo2 = new JTextField();
 		Esclavo2.setBounds(156, 50, 90, 39);
 		panel_1.add(Esclavo2);
@@ -197,7 +220,16 @@ public class UserInterface extends JFrame implements Runnable {
 						perrito4.setVisible(true);
 						perrito5.setVisible(true);
 						perrito7.setVisible(true);
+						perrito6.setVisible(true);
+						InsertPerrito.setVisible(true);
+						fillProvidersBox(perrito7);
 					}
+					else if(Esclavo1.getSelectedItem().equals("Clients"))
+						JOptionPane.showMessageDialog(Main.frame, "You can't create new "
+								+ "clients from here.", "Sorry", JOptionPane.WARNING_MESSAGE);
+					else if(Esclavo1.getSelectedItem().equals("Bills"))
+						JOptionPane.showMessageDialog(Main.frame, "You cant' create new bills from here",
+								"Sorry", JOptionPane.WARNING_MESSAGE);
 				}
 					
 
@@ -214,15 +246,20 @@ public class UserInterface extends JFrame implements Runnable {
 						queryTable.setModel(productsDtm);
 						Product.selectFromProduct(Esclavo1, productsDtm);
 					}
+					else if(Esclavo1.getSelectedItem().equals("Clients")) {
+						queryTable.setModel(clientsDtm);
+						Client.SelectFromClient(Esclavo1, clientsDtm);
+					}
+					else if(Esclavo1.getSelectedItem().equals("Bills")) {
+						queryTable.setModel(billsDtm);
+						Bill.selectFromBills(Esclavo1, billsDtm);
+					}
 				}
 				else
 					JOptionPane.showMessageDialog(Main.frame, "Valid inputs are:\n"
-							+ "INSERT, READ, UPDATE, DELETE.","Invalid input", JOptionPane.WARNING_MESSAGE);
+							+ "INSERT, READ.","Invalid input", JOptionPane.WARNING_MESSAGE);
 			}
-			
-		});
-		
-		
+		});	
 		Esclavito1 = new JTextField();
 		Esclavito1.setVisible(false);
 		Esclavito1.setToolTipText("Insert Code");
@@ -290,6 +327,9 @@ public class UserInterface extends JFrame implements Runnable {
 						else if(Esclavo1.getSelectedItem().equals("Employees"))
 							Employee.deleteEmployee((int)Mano1.getSelectedItem());
 						
+						else if(Esclavo1.getSelectedItem().equals("Products"))
+							Product.deleteFromProduct(Mano1, productsDtm);
+						
 					}
 					else if(Mano2.getText().equalsIgnoreCase("read")) {
 						if(Esclavo1.getSelectedItem().equals("Providers")) {
@@ -305,6 +345,14 @@ public class UserInterface extends JFrame implements Runnable {
 						else if(Esclavo1.getSelectedItem().equals("Products")) {
 							queryTable.setModel(productsDtm);
 							Product.selectFromProduct(Mano1, productsDtm);
+						}
+						else if(Esclavo1.getSelectedItem().equals("Clients")) {
+							queryTable.setModel(clientsDtm);
+							Client.SelectFromClient(Mano1, clientsDtm);
+						}
+						else if(Esclavo1.getSelectedItem().equals("Bills")) {
+							queryTable.setModel(billsDtm);
+							Bill.selectFromBills(Mano1, billsDtm);
 						}
 					}
 					else if(Mano2.getText().equalsIgnoreCase("Update")) {
@@ -381,6 +429,40 @@ public class UserInterface extends JFrame implements Runnable {
 		InsertPerrito = new JButton("Insert");
 		InsertPerrito.setVisible(false);
 		InsertPerrito.setBounds(10, 148, 382, 23);
+		InsertPerrito.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					Product.insertProduct(Integer.valueOf(Perrito1.getText()), 
+							Perrito2.getText(), 
+							Double.valueOf(Perrito3.getText()), 
+							Double.valueOf(perrito4.getText()), 
+							Integer.valueOf(perrito5.getText()), 
+							Integer.valueOf(perrito6.getText()), 
+							(String)perrito7.getSelectedItem(), 
+							productsDtm);
+				}catch(NumberFormatException e) {
+					JOptionPane.showMessageDialog(Main.frame, e, "ERROR", JOptionPane.ERROR_MESSAGE);
+				}
+				Esclavo2.setText(null);
+				Esclavo2.setEnabled(true);
+				Perrito1.setVisible(false);
+				Perrito2.setVisible(false);
+				Perrito3.setVisible(false);
+				perrito4.setVisible(false);
+				perrito5.setVisible(false);
+				perrito7.setVisible(false);
+				perrito6.setVisible(false);
+				InsertPerrito.setVisible(false);
+				Perrito1.setText(null);
+				Perrito2.setText(null);
+				Perrito3.setText(null);
+				perrito4.setText(null);
+				perrito5.setText(null);
+				perrito6.setText(null);	
+			}
+			
+		});
 		panel_1.add(InsertPerrito);
 		
 		txtrConsultas = new JTextArea();
@@ -428,7 +510,7 @@ public class UserInterface extends JFrame implements Runnable {
 		perrito7.setVisible(false);
 		perrito7.setFont(new Font("Dialog", Font.PLAIN, 15));
 		perrito7.setBackground(Color.WHITE);
-		perrito7.setBounds(324, 98, 136, 39);
+		perrito7.setBounds(384, 98, 136, 39);
 		perrito7.addItem("Provider");
 		panel_1.add(perrito7);
 		
@@ -444,6 +526,12 @@ public class UserInterface extends JFrame implements Runnable {
 		queryTable.setFillsViewportHeight(true);
 		queryTable.getTableHeader().setBackground(Color.gray);
 		scrollPane.setViewportView(queryTable);
+		
+		perrito6 = new JTextField();
+		perrito6.setBounds(322, 98, 52, 39);
+		perrito6.setVisible(false);
+		panel_1.add(perrito6);
+		perrito6.setColumns(10);
 	}
 
 	private void fillBoxes(String toFillWith,JComboBox<Object> Box,String tablename) {
@@ -497,6 +585,31 @@ public class UserInterface extends JFrame implements Runnable {
 			}
 		}
 	}
+	private void fillProvidersBox(JComboBox Box) {
+		Statement stm = null;
+		String query = "Select pname from provider";
+		if(ConnManager.getConnection()!=null) {
+			try {
+				stm = ConnManager.getConnection().createStatement();
+				Box.removeAllItems();
+				Box.addItem("Provider");
+				ResultSet rs = stm.executeQuery(query);
+				while(rs.next())
+					Box.addItem(rs.getString("pname"));
+			}catch(SQLException e) {
+				e.printStackTrace();
+			}finally {
+				if(stm!=null) {
+					try {
+						stm.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	}
+	
 	private void innitBillingTab(JPanel panel) {
 		
 		comboBox = new JComboBox<String>();
@@ -697,11 +810,9 @@ public class UserInterface extends JFrame implements Runnable {
 	public void run() {
 		
 	}
-
 }
 
-class ButtonAction implements ActionListener{
-	public static String format;
+class ButtonAction implements ActionListener{	public static String format;
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getActionCommand().equals("BILL")) {
@@ -792,5 +903,4 @@ class ButtonAction implements ActionListener{
 			}
 		}
 	}
-	
 }

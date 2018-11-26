@@ -93,6 +93,7 @@ public class Provider {
 			try {
 				stm = ConnManager.getConnection().createStatement();
 				stm.execute(query);
+				new Provider(idPapo,Pname,Address);
 				JOptionPane.showMessageDialog(Main.frame, "Tu papo esta listo", "Congrats Osc", JOptionPane.INFORMATION_MESSAGE);
 			} catch (SQLException e) {
 				JOptionPane.showMessageDialog(Main.frame, e, "ERROR", JOptionPane.ERROR_MESSAGE);

@@ -5,7 +5,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 public class Client {
 	private static Connection connection = ConnManager.getConnection();
@@ -77,6 +80,36 @@ public class Client {
 		else
 			JOptionPane.showMessageDialog(Main.frame, "Missing an obligatory field.", "Error", JOptionPane.ERROR_MESSAGE);
 		return null;
+	}
+	
+	public static void SelectFromClient(JComboBox Box, DefaultTableModel clientsDtm) {
+		Statement stm = null;
+		String query = null;
+		if(connection != null) {
+			try {
+				stm = connection.createStatement();
+				if(Box.getSelectedIndex()==0 || Box.getSelectedItem().equals("Clients"))
+					query = "Select * from client";
+				else
+					query = "Select * from client where idclient = '"+(String)Box.getSelectedItem()+"';";
+				ResultSet rs = stm.executeQuery(query);
+				clientsDtm.setRowCount(0);
+				while(rs.next()) {
+					Object[] newRow = {rs.getString(1),rs.getString(2),rs.getString(3),rs.getDouble(4)};
+					clientsDtm.addRow(newRow);
+				}
+			} catch (SQLException e) {
+				JOptionPane.showMessageDialog(Main.frame, e, "ERROR", JOptionPane.ERROR_MESSAGE);
+			}finally {
+				if(stm!=null) {
+					try {
+						stm.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}	
+		}
 	}
 	
 	public void addProductToBill(int idemployee,int idproduct) {

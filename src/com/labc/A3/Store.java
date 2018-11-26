@@ -1,5 +1,7 @@
 package com.labc.A3;
 
+import javax.swing.JFrame;
+
 public class Store implements Runnable{
 
 	@Override

@@ -1,0 +1,2 @@
+Main-Class: com/labc/A3/Main
+Class-Path: postgresql-42.2.5.jar
