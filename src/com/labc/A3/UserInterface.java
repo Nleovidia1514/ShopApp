@@ -25,17 +25,6 @@ import javax.swing.ScrollPaneConstants;
 import java.awt.BorderLayout;
 
 public class UserInterface extends JFrame implements Runnable {
-	public UserInterface() {
-		innitGui();
-		addActions();
-		frame.setVisible(true);
-	}
-
-	private void start() {
-		Thread swing = new Thread(this);
-		swing.start();
-	}
-
 	public JFrame frame = this;
 	private JTabbedPane tabbedPane;
 	private JPanel contentPane;
@@ -152,11 +141,11 @@ public class UserInterface extends JFrame implements Runnable {
 		DefaultTableModel productsDtm = new DefaultTableModel(new Object[][] {
 				},
 				new String[] {
-					"ID", "Description", "Buyprice","Sellprice","Restock","Stocked","Provider"
+					"ID", "Description","Sellprice","Restock","Stocked"
 				}) {
 	
 				boolean[] columnEditables = new boolean[] {
-					false, false, false, false, false, false,false
+					false, false, false, false, false,
 				};
 				public boolean isCellEditable(int row, int column) {
 					return columnEditables[column];
@@ -358,6 +347,12 @@ public class UserInterface extends JFrame implements Runnable {
 					else if(Mano2.getText().equalsIgnoreCase("Update")) {
 						if(Esclavo1.getSelectedItem().equals("Providers")) {
 							Provider.papoPeluo((String)Mano1.getSelectedItem(),ProvidersDtm);
+						}
+						else if(Esclavo1.getSelectedItem().equals("Products")) {
+							Product.updateProduct(Integer.valueOf((String) Mano1.getSelectedItem()), productsDtm);
+						}
+						else if(Esclavo1.getSelectedItem().equals("Employees")) {
+							Employee.updateEmployee(Integer.valueOf((String) Mano1.getSelectedItem()), employeesDtm);
 						}
 					}
 					else
@@ -561,7 +556,6 @@ public class UserInterface extends JFrame implements Runnable {
 			
 		}
 	}
-	
 	private void fillOcupationsBox(JComboBox<Object> Box) {
 		Statement stm = null;
 		String query = "Select oname from ocupation";
@@ -808,11 +802,19 @@ public class UserInterface extends JFrame implements Runnable {
 
 	@Override
 	public void run() {
-		
+		innitGui();
+		addActions();
+		frame.setVisible(true);
 	}
+	
+
+	public void start() {
+		new Thread(this).start();;
+	}
+
 }
 
-class ButtonAction implements ActionListener{	public static String format;
+class ButtonAction implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getActionCommand().equals("BILL")) {

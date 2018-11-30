@@ -6,12 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
-
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.table.DefaultTableModel;
 
 public class Provider {
@@ -54,7 +50,7 @@ public class Provider {
 			}
 		}
 	}
-	public static void papocochino(String Pname,DefaultTableModel providersDtm,JComboBox box) {
+	public static void papocochino(String Pname,DefaultTableModel providersDtm,JComboBox<?> box) {
 		Statement stm = null;
 		String query = "select idprovider from provider where Pname ='"+ Pname+"'";
 		if(ConnManager.getConnection()!=null) {
@@ -108,7 +104,7 @@ public class Provider {
 			}
 		}
 	}
-	public static void papoApestoso(JComboBox Box,DefaultTableModel providersDtm) {
+	public static void papoApestoso(JComboBox<?> Box,DefaultTableModel providersDtm) {
 		Statement stm = null;
 		String query = null;
 		if(connection != null) {
@@ -139,7 +135,7 @@ public class Provider {
 	}
 	public static void papoPeluo(String text, DefaultTableModel providersDtm) {
 		Statement stm = null;
-		JComboBox box = new JComboBox();
+		JComboBox<String> box = new JComboBox<String>();
 		box.addItem("idProvider");
 		box.addItem("pName");
 		box.addItem("pAdress");

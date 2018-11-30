@@ -2,12 +2,10 @@ package com.labc.A3;
 
 import java.text.SimpleDateFormat;
 import java.util.Random;
-
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
@@ -20,7 +18,7 @@ public class Main {
 	public static JTextField cedulaID;
 	public static JTextField clientName;
 	public static JTextArea clientAdr;
-	public static JComboBox idType;
+	public static JComboBox<String> idType;
 	public static JFrame frame;
 	public static DefaultTableModel productsArea;
 	public static JTextPane totalPane;
@@ -29,8 +27,11 @@ public class Main {
 	public static JPanel adminpanel;
 	
 	public static void main(String[] args) {
-		UserInterface swing = new UserInterface();
-		Store store = new Store();
-		store.start();
+		startAll();
+	}
+	
+	private static void startAll() {
+		new Store().start();
+		new UserInterface().start();
 	}
 }

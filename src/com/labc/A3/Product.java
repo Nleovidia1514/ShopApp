@@ -1,35 +1,30 @@
 package com.labc.A3;
 
+import java.awt.Color;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
-
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
 import javax.swing.table.DefaultTableModel;
 
 public class Product{
 	private static Connection connection = ConnManager.getConnection();
 	private int idproduct;
 	private String pdescription;
-	private double buyprice;
 	private double sellprice;
 	private int restock;
 	private int stocked;
-	private Provider provider;
 	public static HashMap<Integer,Product> products = new HashMap<Integer,Product>();
 	
-	private Product(int idproduct,String pdescription,double buyprice,double sellprice, int restock,int stocked,Provider provider) {
+	private Product(int idproduct,String pdescription,double sellprice, int restock,int stocked) {
 		this.setIdproduct(idproduct);
 		this.setPdescription(pdescription);
-		this.setBuyprice(buyprice);
 		this.setSellprice(sellprice);
 		this.setRestock(restock);
 		this.setStocked(stocked);
-		this.setProvider(provider);
 		Product.products.put(idproduct, this);
 	}
 	
@@ -43,12 +38,10 @@ public class Product{
 				while(rs.next()) {
 					int idproduct = rs.getInt("idproduct");
 					String pdescription = rs.getString("pdescription");
-					double buyprice = rs.getDouble("buyprice");
 					double sellprice = rs.getDouble("sellprice");
 					int restock = rs.getInt("restock");
 					int stocked = rs.getInt("stock");
-					int idprovider = rs.getInt("idprovider");
-					new Product(idproduct,pdescription,buyprice,sellprice,restock,stocked,Provider.providers.get(idprovider));
+					new Product(idproduct,pdescription,sellprice,restock,stocked);
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -64,7 +57,7 @@ public class Product{
 		}
 	}
 	
-	public static void selectFromProduct(JComboBox Box, DefaultTableModel productsDtm) {
+	public static void selectFromProduct(JComboBox<?> Box, DefaultTableModel productsDtm) {
 		Statement stm = null;
 		String query;
 		if(connection!=null) {
@@ -78,12 +71,10 @@ public class Product{
 				productsDtm.setRowCount(0);
 				while(rs.next()) {
 					try{
-						Object[] newRow = {rs.getInt(1),rs.getString(2),rs.getDouble(3),rs.getDouble(4),rs.getInt(5),
-								rs.getInt(6),Provider.providers.get(rs.getInt(7)).getPname()};
+						Object[] newRow = {rs.getInt(1),rs.getString(2),rs.getDouble(3),rs.getInt(4),rs.getInt(5)};
 						productsDtm.addRow(newRow);
 					}catch(NullPointerException e) {
-						Object[] newRow = {rs.getInt(1),rs.getString(2),rs.getDouble(3),rs.getDouble(4),rs.getInt(5),
-								rs.getInt(6),"PROVIDER REMOVED"};
+						Object[] newRow = {rs.getInt(1),rs.getString(2),rs.getDouble(3),rs.getInt(4),rs.getInt(5)};
 						productsDtm.addRow(newRow);
 					}
 				}
@@ -111,12 +102,15 @@ public class Product{
 				ResultSet rs = stm.executeQuery(query);
 				while(rs.next())
 					 idprovider = rs.getInt(1);
-				new Product(idproduct, pdescription, buyprice, sellprice, restock, stocked, Provider.providers.get(idprovider));
-				query = String.format("insert into product values(%d,'%s',"+buyprice+","+sellprice+",%d,%d,%d)",idproduct,
-						pdescription, restock, stocked, idprovider);
+				new Product(idproduct, pdescription, sellprice, restock, stocked);
+				query = String.format("insert into product values(%d,'%s',"+sellprice+",%d,%d)",idproduct,
+						pdescription, restock, stocked);
 				stm.execute(query);
-				Object[] newRow = {idproduct, pdescription, buyprice, sellprice, restock, stocked, pname};
+				Object[] newRow = {idproduct, pdescription, sellprice, restock, stocked};
 				productsDtm.addRow(newRow);
+				query = String.format("insert into product_provider values (%d,%d,"+buyprice+");",
+						idproduct, idprovider);
+				stm.execute(query);
 				JOptionPane.showMessageDialog(Main.frame, "Product added succesfully", "Added", JOptionPane.INFORMATION_MESSAGE);
 			}catch(SQLException e) {
 				e.printStackTrace();
@@ -131,7 +125,52 @@ public class Product{
 			}
 		}
 	}
-	public static void deleteFromProduct(JComboBox Box, DefaultTableModel productsDtm) {
+	public static void updateProduct(int text, DefaultTableModel productsDtm) {
+		Statement stm = null;
+		JComboBox<String> box = new JComboBox<String>();
+		box.addItem("idproduct");
+		box.addItem("pdescription");
+		box.addItem("sellprice");
+		box.addItem("restock");
+		box.addItem("stock");
+		box.setBackground(Color.WHITE);
+		String toUpdate = JOptionPane.showInputDialog(Main.frame, box, "Which field do you wish"
+				+ " to update?", JOptionPane.QUESTION_MESSAGE);
+		String query = "update product set "+box.getSelectedItem()+" = ";
+		if(box.getSelectedItem().equals("pdescription"))
+			query = query +"'"+ toUpdate+"' where idproduct ="+text+";";
+		else
+			query = query + toUpdate+" where idproduct ="+text+";";
+		if(connection != null && toUpdate!=null) {
+			try {
+				for(int i= productsDtm.getRowCount();i>0;i--) 	{
+					if(productsDtm.getValueAt(i-1, 0).equals(text)) 
+						productsDtm.setValueAt(toUpdate, i-1, box.getSelectedIndex());
+					}
+				stm = connection.createStatement();
+				stm.execute(query);
+				ResultSet rs = stm.executeQuery("Select * from product where "+
+				box.getSelectedItem()+" = "+toUpdate+";");
+				while(rs.next()) {
+					Product.products.remove(rs.getInt(1));
+					new Product(rs.getInt(1),rs.getString(2),rs.getDouble(3),rs.getInt(4),rs.getInt(5));
+				}
+				JOptionPane.showMessageDialog(Main.frame, "Updated succesfully", "Updated",
+						JOptionPane.INFORMATION_MESSAGE);
+			}catch(SQLException e) {
+				e.printStackTrace();
+			}finally {
+				if (stm!=null) {
+					try {
+						stm.close();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	}
+	public static void deleteFromProduct(JComboBox<?> Box, DefaultTableModel productsDtm) {
 		Statement stm = null;
 		int toDelete = Integer.valueOf((String) Box.getSelectedItem());
 		String query = "select idproduct from product where idproduct ="+toDelete+";";
@@ -181,14 +220,6 @@ public class Product{
 		this.pdescription = pdescription;
 	}
 
-	public double getBuyprice() {
-		return buyprice;
-	}
-
-	public void setBuyprice(double buyprice) {
-		this.buyprice = buyprice;
-	}
-
 	public double getSellprice() {
 		return sellprice;
 	}
@@ -211,14 +242,6 @@ public class Product{
 
 	public void setStocked(int stocked) {
 		this.stocked = stocked;
-	}
-
-	public Provider getProvider() {
-		return provider;
-	}
-
-	public void setProvider(Provider provider) {
-		this.provider = provider;
 	}
 
 }

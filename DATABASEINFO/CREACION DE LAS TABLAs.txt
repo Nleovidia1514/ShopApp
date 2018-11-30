@@ -12,13 +12,18 @@ cmoney Numeric(10,2));
 create table product(
 idproduct INTEGER NOT NULL PRIMARY KEY,
 pdescription Varchar(100),
-buyprice Numeric(10,2),
 sellprice Numeric(10,2),
 restock INTEGER,
-stock  INTEGER,
+stock INTEGER);
+
+create table product_provider(
+idproduct INTEGER,
+FOREIGN KEY (idproduct) references product(idproduct)
+ON DELETE SET NULL ON UPDATE CASCADE,
 idprovider INTEGER,
 FOREIGN KEY (idprovider) references provider(idprovider)
-ON DELETE SET NULL ON UPDATE CASCADE);
+ON DELETE SET NULL ON UPDATE CASCADE,
+buyprice Numeric(10,2));
 
 create table ocupation(
 idocupation INTEGER NOT NULL PRIMARY KEY,

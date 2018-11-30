@@ -1,5 +1,10 @@
 package com.labc.A3;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -81,7 +86,7 @@ public class Client {
 			JOptionPane.showMessageDialog(Main.frame, "Missing an obligatory field.", "Error", JOptionPane.ERROR_MESSAGE);
 		return null;
 	}
-	
+
 	public static void SelectFromClient(JComboBox Box, DefaultTableModel clientsDtm) {
 		Statement stm = null;
 		String query = null;
