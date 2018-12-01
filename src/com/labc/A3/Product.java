@@ -141,7 +141,7 @@ public class Product{
 			query = query +"'"+ toUpdate+"' where idproduct ="+text+";";
 		else
 			query = query + toUpdate+" where idproduct ="+text+";";
-		if(connection != null && toUpdate!=null) {
+		if(connection != null && toUpdate!=null && toUpdate!="") {
 			try {
 				for(int i= productsDtm.getRowCount();i>0;i--) 	{
 					if(productsDtm.getValueAt(i-1, 0).equals(text)) 

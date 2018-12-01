@@ -134,6 +134,7 @@ public class Bill {
 		return false;
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public static void selectFromBills(JComboBox Box, DefaultTableModel billsDtm) {
 		Statement stm = null;
 		String query = null;

@@ -1,10 +1,5 @@
 package com.labc.A3;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -87,6 +82,7 @@ public class Client {
 		return null;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static void SelectFromClient(JComboBox Box, DefaultTableModel clientsDtm) {
 		Statement stm = null;
 		String query = null;

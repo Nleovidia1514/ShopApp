@@ -32,6 +32,6 @@ public class Main {
 	
 	private static void startAll() {
 		new Store().start();
-		new UserInterface().start();
+		new UserInterface().start();	
 	}
 }

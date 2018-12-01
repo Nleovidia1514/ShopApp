@@ -24,6 +24,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import java.awt.BorderLayout;
 
+@SuppressWarnings("serial")
 public class UserInterface extends JFrame implements Runnable {
 	public JFrame frame = this;
 	private JTabbedPane tabbedPane;
@@ -47,15 +48,7 @@ public class UserInterface extends JFrame implements Runnable {
 	private JScrollPane scrollPane;
 	private JTable queryTable;
 	private JScrollPane scrollPane_1;
-	private Thread swing;
 	private JTextField perrito6;
-	/**
-	 * Launch the application.
-
-	/**
-	 * Create the frame.
-	 * @return 
-	 */
 	
 	public void innitGui() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -243,10 +236,13 @@ public class UserInterface extends JFrame implements Runnable {
 						queryTable.setModel(billsDtm);
 						Bill.selectFromBills(Esclavo1, billsDtm);
 					}
+					Esclavo2.setText(null);
 				}
-				else
+				else {
 					JOptionPane.showMessageDialog(Main.frame, "Valid inputs are:\n"
 							+ "INSERT, READ.","Invalid input", JOptionPane.WARNING_MESSAGE);
+					Esclavo2.setText(null);
+				}
 			}
 		});	
 		Esclavito1 = new JTextField();
@@ -579,6 +575,7 @@ public class UserInterface extends JFrame implements Runnable {
 			}
 		}
 	}
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void fillProvidersBox(JComboBox Box) {
 		Statement stm = null;
 		String query = "Select pname from provider";
@@ -724,6 +721,7 @@ public class UserInterface extends JFrame implements Runnable {
 					" Product", " Price", "  Quantity", "  Total"
 				}
 			) {
+				@SuppressWarnings("rawtypes")
 				Class[] columnTypes = new Class[] {
 					String.class, Double.class, Integer.class, Double.class
 				};
